@@ -1,0 +1,19 @@
+{
+    "name": "mrzkit/laravel-extension-hierarchical",
+    "description": "laravel extension hierarchical 脚手架",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mrzkit\\LaravelExtensionHierarchical\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "shijie.zhu",
+            "email": "562591971@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
