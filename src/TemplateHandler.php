@@ -39,7 +39,7 @@ use Mrzkit\TemplateEngine\TemplateFileWriter;
 
 class TemplateHandler
 {
-    public function sharRepositoryCreation(string $name) : array
+    public function shardRepositoryCreation(string $name) : array
     {
         $result = [];
 
@@ -102,7 +102,7 @@ class TemplateHandler
         return $result;
     }
 
-    public function sharServiceCreation(string $name) : array
+    public function shardServiceCreation(string $name) : array
     {
         $result = [];
 

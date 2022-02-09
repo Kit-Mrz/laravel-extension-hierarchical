@@ -37,7 +37,7 @@ class Tester
         $name = 'HandleItems';
 
         $th     = new TemplateHandler();
-        $result = $th->sharRepositoryCreation($name);
+        $result = $th->shardRepositoryCreation($name);
         dump($result);
 
         $name = 'RenewalSystem.HandleItem';
@@ -47,7 +47,7 @@ class Tester
         dump($result);
 
         $th     = new TemplateHandler();
-        $result = $th->sharServiceCreation($name);
+        $result = $th->shardServiceCreation($name);
         dump($result);
 
         $th     = new TemplateHandler();
