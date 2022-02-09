@@ -61,7 +61,7 @@ final class {{RNT}} extends CrudModel
      */
     protected $dispatchesEvents = [
         'creating' => Creating::class,
-'updating' => Saving::class,
-'deleting' => Deleting::class,
-];
+        'updating' => Saving::class,
+        'deleting' => Deleting::class,
+    ];
 }
