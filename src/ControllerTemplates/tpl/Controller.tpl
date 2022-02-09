@@ -21,89 +21,89 @@ class {{RNT}}Controller extends Controller
     public function __construct({{RNT}}Service ${{RNT}}Service)
     {
         $this->{{RNT}}Service = ${{RNT}}Service;
-}
+    }
 
-/**
-* @desc 列表
-* @uri get /path?desc=1
-*
-* @return JsonResponse
-*/
-public function index({{RNT}}IndexRequest $request) : JsonResponse
-{
-$params = $request->validated();
+    /**
+     * @desc 列表
+     * @uri get /path?desc=1
+     *
+     * @return JsonResponse
+     */
+    public function index({{RNT}}IndexRequest $request) : JsonResponse
+    {
+        $params = $request->validated();
 
-$result = $this->{{RNT}}Service->index($params);
+        $result = $this->{{RNT}}Service->index($params);
 
-return Back::do()->success($result);
-}
+        return Back::do()->success($result);
+    }
 
-/**
-* @desc 保存
-* @uri post /path?desc=1
-*
-* @param Request $request
-* @return JsonResponse
-*/
-public function store({{RNT}}StoreRequest $request) : JsonResponse
-{
-$params = $request->validated();
+    /**
+     * @desc 保存
+     * @uri post /path?desc=1
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store({{RNT}}StoreRequest $request) : JsonResponse
+    {
+        $params = $request->validated();
 
-$result = $this->{{RNT}}Service->store($params);
+        $result = $this->{{RNT}}Service->store($params);
 
-return Back::do()->success($result);
-}
+        return Back::do()->success($result);
+    }
 
-/**
-* @desc 详情
-* @uri get /path?desc=1
-*
-* @param int $id
-* @return JsonResponse
-*/
-public function show(int $id) : JsonResponse
-{
-$result = $this->{{RNT}}Service->show($id);
+    /**
+     * @desc 详情
+     * @uri get /path?desc=1
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id) : JsonResponse
+    {
+        $result = $this->{{RNT}}Service->show($id);
 
-return Back::do()->success($result);
-}
+        return Back::do()->success($result);
+    }
 
-/**
-* @desc 更新
-* @uri put /path?desc=1
-*
-* @param Request $request
-* @param int $id
-* @return JsonResponse
-*/
-public function update({{RNT}}UpdateRequest $request, int $id) : JsonResponse
-{
-$params = $request->validated();
+    /**
+     * @desc 更新
+     * @uri put /path?desc=1
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update({{RNT}}UpdateRequest $request, int $id) : JsonResponse
+    {
+        $params = $request->validated();
 
-$updated = $this->{{RNT}}Service->update($id, $params);
+        $updated = $this->{{RNT}}Service->update($id, $params);
 
-$result = [
-'updated' => $updated
-];
+        $result = [
+            'updated' => $updated
+        ];
 
-return Back::do()->success($result);
-}
+        return Back::do()->success($result);
+    }
 
-/**
-* @desc 删除
-* @uri delete /path?desc=1
-*
-* @param int $id
-* @return JsonResponse
-*/
-public function destroy(int $id) : JsonResponse
-{
-$deleted = $this->{{RNT}}Service->destroy($id);
+    /**
+     * @desc 删除
+     * @uri delete /path?desc=1
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id) : JsonResponse
+    {
+        $deleted = $this->{{RNT}}Service->destroy($id);
 
-$result = [
-'deleted' => $deleted
-];
+        $result = [
+            'deleted' => $deleted
+        ];
 
-return Back::do()->success($result);
-}
+        return Back::do()->success($result);
+    }
 }
