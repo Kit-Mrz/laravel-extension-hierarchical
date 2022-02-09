@@ -23,5 +23,5 @@ class {{RNT}}Event
     public function __construct({{RNT}} ${{RNT}})
     {
         $this->${{RNT}} = ${{RNT}};
-}
+    }
 }

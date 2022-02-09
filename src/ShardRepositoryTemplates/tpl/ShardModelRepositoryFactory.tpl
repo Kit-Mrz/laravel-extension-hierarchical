@@ -12,17 +12,17 @@ class {{RNT}}RepositoryFactory
     {
         app()->singletonIf({{RNT}}Repository::class);
 
-return app({{RNT}}Repository::class);
-}
+        return app({{RNT}}Repository::class);
+    }
 
-/**
-* @desc 复杂数据仓库
-* @return {{RNT}}RepositoryComplex
-*/
-public static function get{{RNT}}RepositoryComplex() : {{RNT}}RepositoryComplex
-{
-app()->singletonIf({{RNT}}Repository::class);
+    /**
+     * @desc 复杂数据仓库
+     * @return {{RNT}}RepositoryComplex
+     */
+    public static function get{{RNT}}RepositoryComplex() : {{RNT}}RepositoryComplex
+    {
+        app()->singletonIf({{RNT}}Repository::class);
 
-return app({{RNT}}RepositoryComplex::class);
-}
+        return app({{RNT}}RepositoryComplex::class);
+    }
 }

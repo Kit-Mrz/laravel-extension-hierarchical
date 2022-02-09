@@ -12,17 +12,17 @@ class {{RNT}}ServiceFactory
     {
         app()->singletonIf({{RNT}}Service::class);
 
-return app({{RNT}}Service::class);
-}
+        return app({{RNT}}Service::class);
+    }
 
-/**
-* @desc 服务
-* @return {{RNT}}BusinessService
-*/
-public static function get{{RNT}}BusinessService() : {{RNT}}BusinessService
-{
-app()->singletonIf({{RNT}}BusinessService::class);
+    /**
+     * @desc 服务
+     * @return {{RNT}}BusinessService
+     */
+    public static function get{{RNT}}BusinessService() : {{RNT}}BusinessService
+    {
+        app()->singletonIf({{RNT}}BusinessService::class);
 
-return app({{RNT}}BusinessService::class);
-}
+        return app({{RNT}}BusinessService::class);
+    }
 }

@@ -22,101 +22,101 @@ class {{RNT}}Controller extends Controller
     public function __construct({{RNT}}Service ${{RNT}}Service)
     {
         $this->{{RNT}}Service = ${{RNT}}Service;
-}
+    }
 
-/**
-* @desc 列表
-* @uri get /path?desc=1
-*
-* @return JsonResponse
-*/
-public function index({{RNT}}IndexRequest $request) : JsonResponse
-{
-$params = $request->validated();
+    /**
+     * @desc 列表
+     * @uri get /path?desc=1
+     *
+     * @return JsonResponse
+     */
+    public function index({{RNT}}IndexRequest $request) : JsonResponse
+    {
+        $params = $request->validated();
 
-$tenantId = ToolHelper::do()->activeUser()->getTenantId();
+        $tenantId = ToolHelper::do()->activeUser()->getTenantId();
 
-$params["tenantId"] = $tenantId;
+        $params["tenantId"] = $tenantId;
 
-$result = $this->{{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId)->index($params);
+        $result = $this->{{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId)->index($params);
 
-return Back::do()->success($result);
-}
+        return Back::do()->success($result);
+    }
 
-/**
-* @desc 保存
-* @uri post /path?desc=1
-*
-* @param Request $request
-* @return JsonResponse
-*/
-public function store({{RNT}}StoreRequest $request) : JsonResponse
-{
-$params = $request->validated();
+    /**
+     * @desc 保存
+     * @uri post /path?desc=1
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store({{RNT}}StoreRequest $request) : JsonResponse
+    {
+        $params = $request->validated();
 
-$tenantId = ToolHelper::do()->activeUser()->getTenantId();
+        $tenantId = ToolHelper::do()->activeUser()->getTenantId();
 
-$result = $this->{{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId)->store($params);
+        $result = $this->{{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId)->store($params);
 
-return Back::do()->success($result);
-}
+        return Back::do()->success($result);
+    }
 
-/**
-* @desc 详情
-* @uri get /path?desc=1
-*
-* @param int $id
-* @return JsonResponse
-*/
-public function show(int $id) : JsonResponse
-{
-$tenantId = ToolHelper::do()->activeUser()->getTenantId();
+    /**
+     * @desc 详情
+     * @uri get /path?desc=1
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id) : JsonResponse
+    {
+        $tenantId = ToolHelper::do()->activeUser()->getTenantId();
 
-$result = $this->{{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId)->show($id);
+        $result = $this->{{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId)->show($id);
 
-return Back::do()->success($result);
-}
+        return Back::do()->success($result);
+    }
 
-/**
-* @desc 更新
-* @uri put /path?desc=1
-*
-* @param Request $request
-* @param int $id
-* @return JsonResponse
-*/
-public function update({{RNT}}UpdateRequest $request, int $id) : JsonResponse
-{
-$params = $request->validated();
+    /**
+     * @desc 更新
+     * @uri put /path?desc=1
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update({{RNT}}UpdateRequest $request, int $id) : JsonResponse
+    {
+        $params = $request->validated();
 
-$tenantId = ToolHelper::do()->activeUser()->getTenantId();
+        $tenantId = ToolHelper::do()->activeUser()->getTenantId();
 
-$updated = $this->{{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId)->update($id, $params);
+        $updated = $this->{{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId)->update($id, $params);
 
-$result = [
-'updated' => $updated
-];
+        $result = [
+            'updated' => $updated
+        ];
 
-return Back::do()->success($result);
-}
+        return Back::do()->success($result);
+    }
 
-/**
-* @desc 删除
-* @uri delete /path?desc=1
-*
-* @param int $id
-* @return JsonResponse
-*/
-public function destroy(int $id) : JsonResponse
-{
-$tenantId = ToolHelper::do()->activeUser()->getTenantId();
+    /**
+     * @desc 删除
+     * @uri delete /path?desc=1
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id) : JsonResponse
+    {
+        $tenantId = ToolHelper::do()->activeUser()->getTenantId();
 
-$deleted = $this->{{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId)->destroy($id);
+        $deleted = $this->{{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId)->destroy($id);
 
-$result = [
-'deleted' => $deleted
-];
+        $result = [
+            'deleted' => $deleted
+        ];
 
-return Back::do()->success($result);
-}
+        return Back::do()->success($result);
+    }
 }
