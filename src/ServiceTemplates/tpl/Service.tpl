@@ -4,6 +4,7 @@ namespace App\Services\{{NAMESPACE_PATH}}\{{RNT}};
 
 use App\Components\Back\Back;
 use App\Exceptions\Business\EmptyException;
+use App\Exceptions\Business\InvalidArgumentException;
 use App\Exceptions\Business\NotExistsException;
 use App\Exceptions\Fails\CreateException;
 use App\Exceptions\Fails\DeleteException;
@@ -185,5 +186,34 @@ class {{RNT}}Service implements ControlServiceContract
         }
 
         return $obj;
+    }
+
+    /**
+     * @desc 多个
+     * @param array $ids
+     * @return array
+     */
+    public function many(array $ids) : array
+    {
+        if (1 > count($ids)) {
+            throw new InvalidArgumentException();
+        }
+
+        $fields = [
+            {{FILLABLE}}
+        ];
+
+        $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}();
+
+        $objects = $repository->many($ids, $fields);
+
+        $list = [];
+
+        foreach ($objects->getIterator() as $row) {
+            $row    = $row->toArray();
+            $list[] = $item = {{REPOSITORY}}::handleOutput($row);
+        }
+
+        return $list;
     }
 }

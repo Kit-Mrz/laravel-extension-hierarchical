@@ -119,4 +119,21 @@ class {{RNT}}Controller extends Controller
 
         return Back::do()->success($result);
     }
+
+    /**
+     * @desc 多个
+     * @uri get /path?desc=1
+     *
+     * @return JsonResponse
+     */
+    public function many({{RNT}}ManyRequest $request) : JsonResponse
+    {
+        $params = $request->validated();
+
+        $tenantId = ToolHelper::do()->activeUser()->getTenantId();
+
+        $result = $this->{{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId)->many($params["ids"]);
+
+        return Back::do()->success($result);
+    }
 }

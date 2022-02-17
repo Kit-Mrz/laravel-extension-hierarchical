@@ -15,6 +15,7 @@ use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\ModelRepository;
 use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\ModelRepositoryComplex;
 use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\ModelRepositoryFactory;
 use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\IndexRequest;
+use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\ManyRequest;
 use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\StoreRequest;
 use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\UpdateRequest;
 use Mrzkit\LaravelExtensionHierarchical\RouteTemplates\Route;
@@ -135,6 +136,13 @@ class TemplateHandler
         $result = [];
 
         $templateContract = new IndexRequest($name);
+
+        $result[] = [
+            'result'       => $this->handle($templateContract),
+            'saveFilename' => $templateContract->getSaveFilename(),
+        ];
+
+        $templateContract = new ManyRequest($name);
 
         $result[] = [
             'result'       => $this->handle($templateContract),

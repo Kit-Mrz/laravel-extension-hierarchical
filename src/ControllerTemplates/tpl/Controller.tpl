@@ -106,4 +106,19 @@ class {{RNT}}Controller extends Controller
 
         return Back::do()->success($result);
     }
+
+    /**
+     * @desc 多个
+     * @uri get /path?desc=1
+     *
+     * @return JsonResponse
+     */
+    public function many({{RNT}}ManyRequest $request) : JsonResponse
+    {
+        $params = $request->validated();
+
+        $result = $this->{{RNT}}Service->many($params["ids"]);
+
+        return Back::do()->success($result);
+    }
 }

@@ -195,4 +195,33 @@ class {{RNT}}Service implements ControlServiceContract
 
         return $obj;
     }
+
+    /**
+     * @desc 多个
+     * @param array $ids
+     * @return array
+     */
+    public function many(array $ids) : array
+    {
+        if (1 > count($ids)) {
+            throw new InvalidArgumentException();
+        }
+
+        $fields = [
+            {{FILLABLE}}
+        ];
+
+        $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}()->setFactor($this->getFactorId());
+
+        $objects = $repository->many($ids, $fields);
+
+        $list = [];
+
+        foreach ($objects->getIterator() as $row) {
+            $row    = $row->toArray();
+            $list[] = $item = {{REPOSITORY}}::handleOutput($row);
+        }
+
+        return $list;
+    }
 }
