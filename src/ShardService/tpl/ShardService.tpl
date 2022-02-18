@@ -31,18 +31,19 @@ class {{RNT}}Service implements ControlServiceContract
     public function index(array $params)
     {
         $inputParams = [
+            "tenantId"  => (int) ($params["tenantId"] ?? -1),
             "page"      => (int) ($params["page"] ?? 1),
             "perPage"   => (int) ($params["perPage"] ?? 20),
             "orderType" => (string) ($params['orderType'] ?? "-id"),
-            "tenantId"  => (int) ($params["tenantId"]),
         ];
 
-        $list = Cache::remember('{{RNT}}Service:index', 1, function () use($inputParams) {
+        $cacheKey = "{{RNT}}Service:index";
+
+        $list = Cache::remember($cacheKey, 1, function () use($inputParams) {
             //
             $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}()->setFactor($this->getFactorId());
 
             $fields = [
-                'id',
                 {{FILLABLE}}
             ];
 
@@ -60,15 +61,12 @@ class {{RNT}}Service implements ControlServiceContract
                 if (isset($inputParams['tenantId'])) {
                     $query->where('tenant_id', $inputParams['tenantId']);
                 }
-            }, function (Builder $query){
-                // 查看SQL语句
-                // dd($query->toSql());
             });
 
-            $list = Back::do()->retrieveIterator($paginator, function ({{REPOSITORY_NAME}} $obj, int $index){
-                // 转换数组
-                $row = $obj->toArray();
-                // 处理输出
+            $list = Back::do()->retrieveIterator($paginator, function ({{REPOSITORY_NAME}} $object){
+                //
+                $row = $object->toArray();
+                //
                 $item = {{REPOSITORY}}::handleOutput($row);
 
                 return $item;
@@ -101,9 +99,9 @@ class {{RNT}}Service implements ControlServiceContract
 
         $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}()->setFactor($this->getFactorId());
 
-        $obj = $repository->create($inputParams);
+        $object = $repository->create($inputParams);
 
-        return $obj->toArray();
+        return $object->toArray();
     }
 
     /**
@@ -114,12 +112,12 @@ class {{RNT}}Service implements ControlServiceContract
     public function show(int $id)
     {
         $fields = [
-            'id', {{FILLABLE}}
+            {{FILLABLE}}
         ];
 
-        $obj = $this->info($id, $fields);
+        $object = $this->info($id, $fields);
 
-        $row = $obj->toArray();
+        $row = $object->toArray();
 
         $item = {{REPOSITORY}}::handleOutput($row);
 
@@ -146,9 +144,9 @@ class {{RNT}}Service implements ControlServiceContract
 
         {{CODE_TPL_UPDATE}}
 
-        $obj = $this->info($id);
+        $object = $this->info($id);
 
-        $updated = $obj->update($data);
+        $updated = $object->update($data);
 
         if ( !$updated) {
             throw new UpdateException();
@@ -164,9 +162,9 @@ class {{RNT}}Service implements ControlServiceContract
      */
     public function destroy(int $id) : bool
     {
-        $obj = $this->info($id);
+        $object = $this->info($id);
 
-        $deleted = $obj->delete();
+        $deleted = $object->delete();
 
         if ( !$deleted) {
             throw new DeleteException();
@@ -187,13 +185,13 @@ class {{RNT}}Service implements ControlServiceContract
     {
         $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}()->setFactor($this->getFactorId());
 
-        $obj = $repository->info($id, $fields, $relations, $before);
+        $object = $repository->info($id, $fields, $relations, $before);
 
-        if (is_null($obj)) {
+        if (is_null($object)) {
             throw new NotExistsException("{{RNT}}");
         }
 
-        return $obj;
+        return $object;
     }
 
     /**
@@ -219,7 +217,7 @@ class {{RNT}}Service implements ControlServiceContract
 
         foreach ($objects->getIterator() as $row) {
             $row    = $row->toArray();
-            $list[] = $item = {{REPOSITORY}}::handleOutput($row);
+            $list[] = {{REPOSITORY}}::handleOutput($row);
         }
 
         return $list;

@@ -163,7 +163,6 @@ class TableParser
 
     public function getFieldComment() : string
     {
-        //$str = "[\r\n";
         $str = '';
         foreach ($this->getFullColumns() as $item) {
             $field   = $item->Field;
@@ -172,8 +171,6 @@ class TableParser
             $hump = Str::camel($field);
             $str  .= "\"{$hump}\" => \"{$comment}\",\r\n";
         }
-
-        //$str .= "]";
 
         return $str;
     }
@@ -186,8 +183,6 @@ class TableParser
     {
         return $this->fullColumns;
     }
-
-    // 获取字段的数组字符串
 
     /**
      * @desc 查询表信息
@@ -378,18 +373,18 @@ class TableParser
                     break;
                 case 'int':
                 case 'bigint':
-                    $max = PHP_INT_MAX;
+                    $max = 4294967295;
                     $str .= "\"{$fieldItem['humpField']}\" => \"required|integer|between:0,{$max}\",\r\n";
                     break;
                 case 'char':
                 case 'varchar':
                     $max = $fieldItem['length'];
-                    $str .= "\"{$fieldItem['humpField']}\" => \"required|\" . static::regexRule(\"standardString\") . \"|between:0,{$max}\",\r\n";
+                    $str .= "\"{$fieldItem['humpField']}\" => \"required|string|between:0,{$max}\",\r\n";
                     break;
                 case 'float':
                 case 'double':
                 case 'decimal':
-                    $max = PHP_INT_MAX;
+                    $max = 4294967295;
                     $str .= "\"{$fieldItem['humpField']}\" => \"required|numeric|between:0,{$max}\",\r\n";
                     break;
                 case 'datetime':
@@ -435,7 +430,6 @@ class TableParser
                 case 'char':
                 case 'varchar':
                     $str .= "\"{$fieldItem['humpField']}.required\" => \"缺少 {$fieldItem['humpField']} 字段\",\r\n";
-                    //$str .= "\"{$fieldItem['humpField']}.string\" => \"{$fieldItem['humpField']} 格式错误\",\r\n";
                     $str .= "\"{$fieldItem['humpField']}.regex\" => \"字段 {$fieldItem['humpField']} 格式错误，仅允许输入中文、英文、数字、下划线(_)、连接符(-)\",\r\n";
                     $str .= "\"{$fieldItem['humpField']}.between\" => \"字段 {$fieldItem['humpField']} 超出长度，允许 0~{$fieldItem['length']} 个字符\",\r\n\r\n";
                     break;
@@ -487,19 +481,18 @@ class TableParser
                     break;
                 case 'int':
                 case 'bigint':
-                    $max = PHP_INT_MAX;
+                    $max = 4294967295;
                     $str .= "\"{$fieldItem['humpField']}\" => \"integer|between:0,{$max}\",\r\n";
                     break;
                 case 'char':
                 case 'varchar':
                     $max = $fieldItem['length'];
-                    //$str .= "\"{$fieldItem['humpField']}\" => \"string|between:0,{$max}\",\r\n";
-                    $str .= "\"{$fieldItem['humpField']}\" =>  static::regexRule(\"standardString\") . \"|between:0,{$max}\",\r\n";
+                    $str .= "\"{$fieldItem['humpField']}\" =>  \"string|between:0,{$max}\",\r\n";
                     break;
                 case 'float':
                 case 'double':
                 case 'decimal':
-                    $max = PHP_INT_MAX;
+                    $max = 4294967295;
                     $str .= "\"{$fieldItem['humpField']}\" => \"numeric|between:0,{$max}\",\r\n";
                     break;
                 case 'datetime':
@@ -543,7 +536,6 @@ class TableParser
                     break;
                 case 'char':
                 case 'varchar':
-                    //$str .= "\"{$fieldItem['humpField']}.string\" => \"{$fieldItem['humpField']} 格式错误\",\r\n";
                     $str .= "\"{$fieldItem['humpField']}.regex\" => \"字段 {$fieldItem['humpField']} 格式错误，仅允许输入中文、英文、数字、下划线(_)、连接符(-)\",\r\n";
                     $str .= "\"{$fieldItem['humpField']}.between\" => \"字段 {$fieldItem['humpField']} 超出长度，允许 0~{$fieldItem['length']} 个字符\",\r\n\r\n";
                     break;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls;
 use App\Components\Back\Back;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls\Requests\{{RNT}}IndexRequest;
+use App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls\Requests\{{RNT}}ManyRequest;
 use App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls\Requests\{{RNT}}StoreRequest;
 use App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls\Requests\{{RNT}}UpdateRequest;
 use App\Services\{{NAMESPACE_PATH}}\{{RNT}}\{{RNT}}Service;

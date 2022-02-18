@@ -9,8 +9,6 @@ use Mrzkit\LaravelExtensionHierarchical\ComponentTemplates\ComponentImpl;
 use Mrzkit\LaravelExtensionHierarchical\ComponentTemplates\ComponentInterface;
 use Mrzkit\LaravelExtensionHierarchical\ControllerTemplates\Controller;
 use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\Model;
-use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\ModelEvent;
-use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\ModelListener;
 use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\ModelRepository;
 use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\ModelRepositoryComplex;
 use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\ModelRepositoryFactory;
@@ -25,8 +23,6 @@ use Mrzkit\LaravelExtensionHierarchical\ServiceTemplates\Service;
 use Mrzkit\LaravelExtensionHierarchical\ServiceTemplates\ServiceFactory;
 use Mrzkit\LaravelExtensionHierarchical\ShardControllerTemplates\ShardController;
 use Mrzkit\LaravelExtensionHierarchical\ShardRepositoryTemplates\ShardModel;
-use Mrzkit\LaravelExtensionHierarchical\ShardRepositoryTemplates\ShardModelEvent;
-use Mrzkit\LaravelExtensionHierarchical\ShardRepositoryTemplates\ShardModelListener;
 use Mrzkit\LaravelExtensionHierarchical\ShardRepositoryTemplates\ShardModelRepository;
 use Mrzkit\LaravelExtensionHierarchical\ShardRepositoryTemplates\ShardModelRepositoryComplex;
 use Mrzkit\LaravelExtensionHierarchical\ShardRepositoryTemplates\ShardModelRepositoryFactory;
@@ -51,6 +47,7 @@ class TemplateHandler
             'saveFilename' => $templateContract->getSaveFilename(),
         ];
 
+        /*
         $templateContract = new ShardModelEvent($name);
 
         $result[] = [
@@ -64,6 +61,7 @@ class TemplateHandler
             'result'       => $this->handle($templateContract),
             'saveFilename' => $templateContract->getSaveFilename(),
         ];
+        */
 
         $templateContract = new ShardModelRepository($name);
 
@@ -191,6 +189,7 @@ class TemplateHandler
             'saveFilename' => $templateContract->getSaveFilename(),
         ];
 
+        /*
         $templateContract = new ModelEvent($name);
 
         $result[] = [
@@ -204,6 +203,7 @@ class TemplateHandler
             'result'       => $this->handle($templateContract),
             'saveFilename' => $templateContract->getSaveFilename(),
         ];
+        */
 
         $templateContract = new ModelRepository($name);
 

@@ -88,7 +88,7 @@ class CodeTemplate
     public function codeTplStore(array $fields) : string
     {
         $rs = '';
-        foreach ($fields as $field => $item) {
+        foreach ($fields as $item) {
             $str = '"' . $item['under'] . '" => $params["' . $item['hump'] . '"],';
             $rs  .= "\r\n";
             $rs  .= $str;
@@ -105,7 +105,7 @@ class CodeTemplate
     public function codeTplIndex(array $fields) : string
     {
         $rs = '';
-        foreach ($fields as $field => $item) {
+        foreach ($fields as $item) {
             $str = '"' . $item['hump'] . '" => $obj["' . $item['under'] . '"],';
             $rs  .= "\r\n";
             $rs  .= $str;

@@ -25,9 +25,9 @@ class {{RNT}}IndexRequest extends FormRequest
         $orderType = join(',', ['-id', '+id']);
 
         return [
-            'page'    => 'required|integer|between:0,10000',
-            'perPage' => 'required|integer|between:2,10000',
-            'orderType'  => "string|in:{$orderType}",
+            'page'      => 'required|integer|between:0,10000',
+            'perPage'   => 'required|integer|between:0,10000',
+            'orderType' => "string|in:{$orderType}",
         ];
     }
 

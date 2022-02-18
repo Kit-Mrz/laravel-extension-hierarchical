@@ -23,7 +23,7 @@ class {{RNT}}ManyRequest extends FormRequest
     public static function getRules() : array
     {
         return [
-            'ids.*' => "required|integer|between:0,2147483647",
+            'ids.*' => "required|integer|between:0,4294967295",
         ];
     }
 

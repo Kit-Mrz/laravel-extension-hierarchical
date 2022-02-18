@@ -32,12 +32,13 @@ class {{RNT}}Service implements ControlServiceContract
             "orderType" => (string) ($params['orderType'] ?? "-id"),
         ];
 
-        $list = Cache::remember('{{RNT}}Service:index', 1, function () use($inputParams) {
+        $cacheKey = "{{RNT}}Service:index";
+
+        $list = Cache::remember($cacheKey, 1, function () use($inputParams) {
             //
             $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}();
 
             $fields = [
-                'id',
                 {{FILLABLE}}
             ];
 
@@ -57,10 +58,10 @@ class {{RNT}}Service implements ControlServiceContract
                 }
             });
 
-            $list = Back::do()->retrieveIterator($paginator, function ({{RNT}} $obj, int $index){
-                // 转换数组
-                $row = $obj->toArray();
-                // 处理输出
+            $list = Back::do()->retrieveIterator($paginator, function ({{REPOSITORY_NAME}} $object){
+                //
+                $row = $object->toArray();
+                //
                 $item = {{REPOSITORY}}::handleOutput($row);
 
                 return $item;
@@ -93,9 +94,9 @@ class {{RNT}}Service implements ControlServiceContract
 
         $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}();
 
-        $obj = $repository->create($inputParams);
+        $object = $repository->create($inputParams);
 
-        return $obj->toArray();
+        return $object->toArray();
     }
 
     /**
@@ -109,9 +110,9 @@ class {{RNT}}Service implements ControlServiceContract
             'id', {{FILLABLE}}
         ];
 
-        $obj = $this->info($id, $fields);
+        $object = $this->info($id, $fields);
 
-        $row = $obj->toArray();
+        $row = $object->toArray();
 
         $item = {{REPOSITORY}}::handleOutput($row);
 
@@ -130,17 +131,17 @@ class {{RNT}}Service implements ControlServiceContract
             {{HUMP_FIELDS}}
         ]);
 
-        if (empty($inputParams)) {
-            throw new EmptyException();
-        }
-
         $data = [];
 
         {{CODE_TPL_UPDATE}}
 
-        $obj = $this->info($id);
+        if (empty($inputParams)) {
+            throw new EmptyException();
+        }
 
-        $updated = $obj->update($data);
+        $object = $this->info($id);
+
+        $updated = $object->update($data);
 
         if ( !$updated) {
             throw new UpdateException();
@@ -156,9 +157,9 @@ class {{RNT}}Service implements ControlServiceContract
      */
     public function destroy(int $id) : bool
     {
-        $obj = $this->info($id);
+        $object = $this->info($id);
 
-        $deleted = $obj->delete();
+        $deleted = $object->delete();
 
         if ( !$deleted) {
             throw new DeleteException();
@@ -179,13 +180,13 @@ class {{RNT}}Service implements ControlServiceContract
     {
         $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}();
 
-        $obj = $repository->info($id, $fields, $relations, $before);
+        $object = $repository->info($id, $fields, $relations, $before);
 
-        if (is_null($obj)) {
+        if (is_null($object)) {
             throw new NotExistsException("{{RNT}}");
         }
 
-        return $obj;
+        return $object;
     }
 
     /**
@@ -211,7 +212,7 @@ class {{RNT}}Service implements ControlServiceContract
 
         foreach ($objects->getIterator() as $row) {
             $row    = $row->toArray();
-            $list[] = $item = {{REPOSITORY}}::handleOutput($row);
+            $list[] = {{REPOSITORY}}::handleOutput($row);
         }
 
         return $list;
