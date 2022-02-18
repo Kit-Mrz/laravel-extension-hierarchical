@@ -68,7 +68,7 @@ class CodeTemplate
     public function codeTplUpdate(array $fields) : string
     {
         $rs = '';
-        foreach ($fields as $field => $item) {
+        foreach ($fields as $item) {
             $str = '
         if (isset($inputParams["' . $item['hump'] . '"])) {
             $data["' . $item['under'] . '"] = $inputParams["' . $item['hump'] . '"];

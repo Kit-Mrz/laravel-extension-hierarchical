@@ -6,9 +6,9 @@ use App\Components\Back\Back;
 use App\Exceptions\Business\EmptyException;
 use App\Exceptions\Business\InvalidArgumentException;
 use App\Exceptions\Business\NotExistsException;
-use App\Exceptions\Fails\CreateException;
 use App\Exceptions\Fails\DeleteException;
 use App\Exceptions\Fails\UpdateException;
+use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY_NAME}};
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY}};
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY}}Factory;
 use Closure;
@@ -67,10 +67,10 @@ class {{RNT}}Service implements ControlServiceContract
                 return $item;
             });
 
-        return $list;
-    });
+            return $list;
+        });
 
-    return $list;
+        return $list;
     }
 
     /**
@@ -107,7 +107,7 @@ class {{RNT}}Service implements ControlServiceContract
     public function show(int $id) : array
     {
         $fields = [
-            'id', {{FILLABLE}}
+            {{FILLABLE}}
         ];
 
         $object = $this->info($id, $fields);
