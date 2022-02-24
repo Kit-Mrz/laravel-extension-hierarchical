@@ -4,6 +4,7 @@ namespace App\Services\{{NAMESPACE_PATH}}\{{RNT}};
 
 use App\Components\Back\Back;
 use App\Exceptions\Business\EmptyException;
+use App\Exceptions\Business\InvalidArgumentException;
 use App\Exceptions\Business\NotExistsException;
 use App\Exceptions\Fails\DeleteException;
 use App\Exceptions\Fails\UpdateException;
