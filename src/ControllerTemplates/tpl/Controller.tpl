@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls;
 
 use App\Components\Back\Back;
+use App\Components\ToolHelper\ToolHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls\Requests\{{RNT}}IndexRequest;
 use App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls\Requests\{{RNT}}ManyRequest;
@@ -21,7 +22,8 @@ class {{RNT}}Controller extends Controller
 
     public function __construct({{RNT}}Service ${{RNT}}Service)
     {
-        $this->{{RNT}}Service = ${{RNT}}Service;
+        $tenantId = ToolHelper::do()->activeUser()->getTenantId();
+        $this->{{RNT}}Service = ${{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId);
     }
 
     /**

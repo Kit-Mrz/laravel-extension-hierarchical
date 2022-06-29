@@ -12,6 +12,7 @@ use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY_NAME}};
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY}};
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY}}Factory;
 use App\Supports\Spreadsheet\TransObjects\TenantTrans;
+use App\Supports\Cores\TenantShareTrait;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
@@ -21,8 +22,7 @@ use Mrzkit\LaravelExtensionEloquent\FactorTrait;
 
 class {{RNT}}Service implements ControlServiceContract
 {
-    use FactorTrait;
-    use TenantTrans;
+    use TenantShareTrait;
 
     /**
      * @desc 基本列表

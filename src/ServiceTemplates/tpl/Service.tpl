@@ -11,6 +11,7 @@ use App\Exceptions\Fails\UpdateException;
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY_NAME}};
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY}};
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY}}Factory;
+use App\Supports\Cores\TenantShareTrait;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
@@ -19,6 +20,8 @@ use Mrzkit\LaravelExtensionEloquent\Contracts\ControlServiceContract;
 
 class {{RNT}}Service implements ControlServiceContract
 {
+    use TenantShareTrait;
+
     /**
      * @desc 基本列表
      * @param array $params 查询参数
