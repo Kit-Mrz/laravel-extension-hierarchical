@@ -44,7 +44,7 @@ class {{RNT}}Service implements ControlServiceContract
             //
             $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}()->setFactor($this->getFactorId());
 
-            $fields = {{REPOSITORY}}::getSnake();
+            $fields = {{REPOSITORY_NAME}}::getSnake();
 
             $relations = [];
 
@@ -110,7 +110,7 @@ class {{RNT}}Service implements ControlServiceContract
      */
     public function show(int $id)
     {
-        $fields = {{REPOSITORY}}::getSnake();
+        $fields = {{REPOSITORY_NAME}}::getSnake();
 
         $object = $this->info($id, $fields);
 
@@ -202,7 +202,7 @@ class {{RNT}}Service implements ControlServiceContract
             throw new InvalidArgumentException();
         }
 
-        $fields = {{REPOSITORY}}::getSnake();
+        $fields = {{REPOSITORY_NAME}}::getSnake();
 
         $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}()->setFactor($this->getFactorId());
 
