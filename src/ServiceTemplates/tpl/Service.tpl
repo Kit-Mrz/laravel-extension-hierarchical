@@ -38,9 +38,7 @@ class {{RNT}}Service implements ControlServiceContract
             //
             $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}();
 
-            $fields = [
-                {{FILLABLE}}
-            ];
+            $fields = {{REPOSITORY}}::getSnake();
 
             $relations = [];
 
@@ -106,9 +104,7 @@ class {{RNT}}Service implements ControlServiceContract
      */
     public function show(int $id) : array
     {
-        $fields = [
-            {{FILLABLE}}
-        ];
+        $fields = {{REPOSITORY}}::getSnake();
 
         $object = $this->info($id, $fields);
 
@@ -200,9 +196,7 @@ class {{RNT}}Service implements ControlServiceContract
             throw new InvalidArgumentException();
         }
 
-        $fields = [
-            {{FILLABLE}}
-        ];
+        $fields = {{REPOSITORY}}::getSnake();
 
         $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}();
 
