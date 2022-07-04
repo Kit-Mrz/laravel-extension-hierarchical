@@ -70,8 +70,8 @@ class CodeTemplate
         $rs = '';
         foreach ($fields as $item) {
             $str = '
-        if (isset($inputParams["' . $item['hump'] . '"])) {
-            $data["' . $item['under'] . '"] = $inputParams["' . $item['hump'] . '"];
+        if (isset($params["' . $item['hump'] . '"])) {
+            $data["' . $item['under'] . '"] = $params["' . $item['hump'] . '"];
         }
         ';
             $rs  .= $str;
