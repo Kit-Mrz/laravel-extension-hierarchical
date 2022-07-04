@@ -41,8 +41,6 @@ final class {{RNT}} extends CrudModel
      */
     protected $fillable = [
         {{FILLABLE}}
-        'created_by', 'updated_by', 'deleted_by',
-        'created_at', 'updated_at', 'deleted_at',
     ];
 
     /**
@@ -64,4 +62,16 @@ final class {{RNT}} extends CrudModel
         'updating' => Saving::class,
         'deleting' => Deleting::class,
     ];
+
+    /**
+     * 表字段
+     *
+     * @var array
+     */
+    public static function getSnake() : array
+    {
+        return [
+            {{FILLABLE}}
+        ];
+    }
 }

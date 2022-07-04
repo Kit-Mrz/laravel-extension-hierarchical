@@ -84,14 +84,6 @@ class {{RNT}}Service implements ControlServiceContract
      */
     public function store(array $params) : array
     {
-        $params = Arr::only($params, [
-            {{HUMP_FIELDS}}
-        ]);
-
-        if (empty($params)) {
-            throw new EmptyException();
-        }
-
         $inputParams = [
             {{CODE_TPL_STORE}}
         ];
@@ -129,17 +121,13 @@ class {{RNT}}Service implements ControlServiceContract
      */
     public function update(int $id, array $params) : bool
     {
-        $inputParams = Arr::only($params, [
-            {{HUMP_FIELDS}}
-        ]);
-
-        if (empty($inputParams)) {
-            throw new EmptyException();
-        }
-
         $data = [];
 
         {{CODE_TPL_UPDATE}}
+
+        if (empty($data)) {
+            throw new EmptyException();
+        }
 
         $object = $this->info($id);
 

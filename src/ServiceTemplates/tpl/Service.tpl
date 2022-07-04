@@ -54,8 +54,8 @@ class {{RNT}}Service implements ControlServiceContract
 
             $paginator = $repository->retrieve($fields, $relations, $paginateParams, $orderConfig, function (Builder $query) use($inputParams){
                 //
-                if (isset($inputParams['???'])) {
-                    //$query->where('??', $inputParams['???']);
+                if (isset($inputParams['tenantId'])) {
+                    //$query->where('tenant_id', $inputParams['tenantId']);
                 }
             });
 
@@ -81,14 +81,6 @@ class {{RNT}}Service implements ControlServiceContract
      */
     public function store(array $params) : array
     {
-        $params = Arr::only($params, [
-            {{HUMP_FIELDS}}
-        ]);
-
-        if (empty($params)) {
-            throw new EmptyException();
-        }
-
         $inputParams = [
             {{CODE_TPL_STORE}}
         ];
@@ -126,15 +118,11 @@ class {{RNT}}Service implements ControlServiceContract
      */
     public function update(int $id, array $params) : bool
     {
-        $inputParams = Arr::only($params, [
-            {{HUMP_FIELDS}}
-        ]);
-
         $data = [];
 
         {{CODE_TPL_UPDATE}}
 
-        if (empty($inputParams)) {
+        if (empty($data)) {
             throw new EmptyException();
         }
 

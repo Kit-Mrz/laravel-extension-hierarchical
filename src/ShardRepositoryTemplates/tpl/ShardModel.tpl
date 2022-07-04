@@ -41,8 +41,6 @@ final class {{RNT}} extends ShardModel
      */
     protected $fillable = [
         {{FILLABLE}}
-        'created_by', 'updated_by', 'deleted_by',
-        'created_at', 'updated_at', 'deleted_at',
     ];
 
 
@@ -122,5 +120,17 @@ final class {{RNT}} extends ShardModel
     public function getShardCount() : int
     {
         return count($this->getShardConfig());
+    }
+
+    /**
+     * 表字段
+     *
+     * @var array
+     */
+    public static function getSnake() : array
+    {
+        return [
+            {{FILLABLE}}
+        ];
     }
 }

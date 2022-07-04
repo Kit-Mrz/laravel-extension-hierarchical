@@ -189,22 +189,6 @@ class TemplateHandler
             'saveFilename' => $templateContract->getSaveFilename(),
         ];
 
-        /*
-        $templateContract = new ModelEvent($name);
-
-        $result[] = [
-            'result'       => $this->handle($templateContract),
-            'saveFilename' => $templateContract->getSaveFilename(),
-        ];
-
-        $templateContract = new ModelListener($name);
-
-        $result[] = [
-            'result'       => $this->handle($templateContract),
-            'saveFilename' => $templateContract->getSaveFilename(),
-        ];
-        */
-
         $templateContract = new ModelRepository($name);
 
         $result[] = [
