@@ -35,24 +35,6 @@ final class {{RNT}} extends CrudModel
     protected $attributes = [];
 
     /**
-     * 可以批量赋值的属性
-     *
-     * @var array
-     */
-    protected $fillable = [
-        {{FILLABLE}}
-    ];
-
-    /**
-     * 字段注释
-     *
-     * @var array
-     */
-    protected static $attributeComments = [
-        {{ATTRIBUTE_COMMENT}}
-    ];
-
-    /**
      * 映射 Eloquent 事件
      *
      * @var array
@@ -64,14 +46,21 @@ final class {{RNT}} extends CrudModel
     ];
 
     /**
-     * 表字段
+     * 可以批量赋值的属性
      *
      * @var array
      */
-    public static function getSnake() : array
-    {
-        return [
-            {{FILLABLE}}
-        ];
-    }
+    protected $fillable = [
+        {{FILLABLE}}
+    ];
+
+   /**
+    * 字段注释
+    *
+    * @var array
+    */
+    protected static $fields = [
+        {{FIELDS}}
+    ];
+
 }

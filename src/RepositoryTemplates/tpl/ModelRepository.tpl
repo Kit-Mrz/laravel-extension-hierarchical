@@ -20,8 +20,8 @@ final class {{RNT}}Repository extends CrudRepository
         return [
             'relationName' => (function (array $where){
                 return function ($query) use ($where){
-                // $fields = [];
-                // $query->select($fields);
+                    // $fields = [];
+                    // $query->select($fields);
                 };
             }),
         ];

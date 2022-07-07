@@ -2,46 +2,77 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates;
 
-use InvalidArgumentException;
-use Mrzkit\LaravelExtensionHierarchical\CodeTemplate;
-use Mrzkit\LaravelExtensionHierarchical\TableParser;
+use Mrzkit\LaravelExtensionHierarchical\NewTableParser;
+use Mrzkit\LaravelExtensionHierarchical\TableInformation;
 use Mrzkit\LaravelExtensionHierarchical\TemplateAbstract;
+use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\TemplateCreatorContract;
 
-class ModelRepositoryFactory extends TemplateAbstract
+class ModelRepositoryFactory extends TemplateAbstract implements TemplateCreatorContract
 {
-    public function __construct(string $name)
+    /**
+     * @var string 数据表名称
+     */
+    private $tableName;
+
+    /**
+     * @var NewTableParser 数据表解析器
+     */
+    private $tableParser;
+
+    public function __construct(string $tableName, string $tablePrefix = '')
     {
-        $parser       = new TableParser($name, env('DB_PREFIX'));
-        $codeTemplate = new CodeTemplate();
+        $this->tableName   = $tableName;
+        $this->tablePrefix = $tablePrefix;
+        $this->tableParser = new NewTableParser(new TableInformation($tableName, $tablePrefix));
+    }
 
-        $fillable         = $parser->getFieldString();
-        $attributeComment = $parser->getFieldComment();
+    /**
+     * @return string
+     */
+    public function getTableName() : string
+    {
+        return $this->tableName;
+    }
 
-        $codeTplItem     = $codeTemplate->codeTplItem($parser->getUnionFields());
-        $codeTplItemHump = $codeTemplate->codeTplItemHump($parser->getUnionFields());
-        $codeTplItemIf   = $codeTemplate->codeTplItemIf($parser->getUnionFields());
+    /**
+     * @return NewTableParser
+     */
+    public function getTableParser() : NewTableParser
+    {
+        return $this->tableParser;
+    }
 
-        $pattern = '/^\w+$/';
+    /**
+     * @return string
+     */
+    public function getTablePrefix() : string
+    {
+        return $this->tablePrefix;
+    }
 
-        if ( !preg_match($pattern, $name, $matches)) {
-            throw new InvalidArgumentException("Match fail : {$name}");
-        }
+    public function handle() : array
+    {
+        $parser = $this->getTableParser();
+
+        $tableName = $parser->getRenderTableName();
+
+        //********************************************************
 
         // 是否强制覆盖: true=覆盖,false=不覆盖
         $forceCover = false;
 
         // 保存目录
-        $saveDirectory = app()->basePath("app/Repositories/{$name}");
+        $saveDirectory = app()->basePath("app/Repositories/{$tableName}");
 
         // 保存文件名称
-        $saveFilename = $saveDirectory . '/' . $name . 'RepositoryFactory.php';
+        $saveFilename = $saveDirectory . '/' . $tableName . 'RepositoryFactory.php';
 
         // 模板文件
         $sourceTemplateFile = __DIR__ . '/tpl/ModelRepositoryFactory.tpl';
 
         // 替换规则
         $replacementRules = [
-            '/{{RNT}}/' => $name,
+            '/{{RNT}}/' => $tableName,
         ];
 
         // 替换规则-回调
@@ -55,5 +86,7 @@ class ModelRepositoryFactory extends TemplateAbstract
             ->setSourceTemplateFile($sourceTemplateFile)
             ->setReplacementRules($replacementRules)
             ->setReplacementRuleCallbacks($replacementRuleCallbacks);
+
+        return [];
     }
 }

@@ -2,50 +2,133 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical\RouteTemplates;
 
+use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Mrzkit\LaravelExtensionHierarchical\NewTableParser;
+use Mrzkit\LaravelExtensionHierarchical\TableInformation;
 use Mrzkit\LaravelExtensionHierarchical\TemplateAbstract;
+use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\TemplateCreatorContract;
+use Mrzkit\LaravelExtensionHierarchical\TemplateTool;
 
-class Route extends TemplateAbstract
+class Route extends TemplateAbstract implements TemplateCreatorContract
 {
+    use TemplateTool;
+
+    /**
+     * @var string 控制器名称
+     */
+    private $controlName;
+
+    /**
+     * @var string 数据表名称
+     */
+    private $tableName;
+
+    /**
+     * @var NewTableParser 数据表解析器
+     */
+    private $tableParser;
+
+    public function __construct(string $controlName, string $tableName, string $tablePrefix = '')
+    {
+        if ( !$this->validateControlName($controlName)) {
+            throw new \Exception("格式有误，参考格式: A.B 或 A.B.C ");
+        }
+
+        $this->controlName = $controlName;
+        $this->tableName   = $tableName;
+        $this->tablePrefix = $tablePrefix;
+        $this->tableParser = new NewTableParser(new TableInformation($tableName, $tablePrefix));
+    }
+
+    /**
+     * @return string
+     */
+    public function getControlName() : string
+    {
+        return $this->controlName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableName() : string
+    {
+        return $this->tableName;
+    }
+
+    /**
+     * @return NewTableParser
+     */
+    public function getTableParser() : NewTableParser
+    {
+        return $this->tableParser;
+    }
+
     /**
      * @var string
      */
     private $routePath;
 
-    public function __construct(string $name)
+    public function handle() : array
     {
-        $replaceTarget = str_replace('/', '.', $name);
+        $fullControlName = $this->getControlName();
 
-        $pattern = '/^\w+\\.\w+$/';
-
-        if ( !preg_match($pattern, $replaceTarget, $matches)) {
-            throw new InvalidArgumentException("Match fail : {$replaceTarget}");
+        if (strrpos($fullControlName, '.') !== false) {
+            $firstControlName = substr($fullControlName, 0, strrpos($fullControlName, '.'));
+        } else {
+            $firstControlName = $fullControlName;
         }
 
-        list($routeFileName, $routeName) = explode('.', $replaceTarget);
+        if (strripos($fullControlName, '.') !== false) {
+            $controlName = substr($fullControlName, strripos($fullControlName, '.') + 1);
+        } else {
+            $controlName = $fullControlName;
+        }
 
-        $saveTo = app()->basePath("routes");
+        if (strripos($fullControlName, '.') !== false) {
+            $namespacePath = substr($fullControlName, 0, strripos($fullControlName, '.'));
+            $namespacePath = str_replace('.', '\\', $namespacePath);
+        } else {
+            $namespacePath = $fullControlName;
+        }
 
-        // 替换为小驼峰: AminRoute => adminRoute
-        $route = strtolower(substr($routeFileName, 0, 1)) . substr($routeFileName, 1);
+        $directoryPath = str_replace('\\', DIRECTORY_SEPARATOR, $namespacePath);
+        $directoryPath = strlen($directoryPath) > 0 ? $directoryPath . DIRECTORY_SEPARATOR : $directoryPath;
+
+        //********************************************************
+        $controlPathName = Str::snake($controlName, '-');
+
+        // ************************************
+
+        $firstControlNameCamel = Str::camel($firstControlName);
+
         // 模板和写入文件都是自己
-        $routePath = $saveTo . '/' . $route . '.php';
+        $routePath = app()->basePath("routes") . '/' . $firstControlNameCamel . '.php';
+
         if ( !file_exists($routePath)) {
-            throw new InvalidArgumentException('路由文件不存在:' . $routePath);
+            $tpl = file_get_contents(__DIR__ . '/tpl/RouteEmpty.tpl');
+
+            if (file_put_contents($routePath, $tpl) === false) {
+                throw new InvalidArgumentException('创建路由文件失败:' . $routePath);
+            }
         }
-        $this->setRoutePath($routePath);
+        // 设置路由
+        $this->routePath = $routePath;
 
         // 读取路由文件
         $content = file_get_contents($routePath);
+
         // 如果有此关键字，则不添加
         $force = true;
-        if (preg_match("/{$routeName}/", $content)) {
+        if (preg_match("/{$controlName}/", $content)) {
             $force = false;
         }
-        $lowerRouteName = strtolower($routeName);
 
         // 中间件
-        $authMiddleware = $route == 'adminSystem' ? 'auth:adm' : 'auth:api';
+        $authMiddleware = $controlName == 'AdminSystem' ? 'auth:adm' : 'auth:api';
+
+        //********************************************************
 
         // 是否强制覆盖: true=覆盖,false=不覆盖
         $forceCover = $force;
@@ -62,9 +145,9 @@ class Route extends TemplateAbstract
         // 替换规则
         $replacementRules = [
             '/{{AUTH_MIDDLEWARE}}/'  => $authMiddleware,
-            '/{{NAMESPACE_PATH}}/'   => $routeFileName,
-            '/{{RNT}}/'              => $routeName,
-            '/{{LOWER_ROUTE_NAME}}/' => $lowerRouteName,
+            '/{{NAMESPACE_PATH}}/'   => $namespacePath,
+            '/{{RNT}}/'              => $controlName,
+            '/{{LOWER_ROUTE_NAME}}/' => $controlPathName,
         ];
 
         // 替换规则-回调
@@ -78,6 +161,8 @@ class Route extends TemplateAbstract
             ->setSourceTemplateFile($sourceTemplateFile)
             ->setReplacementRules($replacementRules)
             ->setReplacementRuleCallbacks($replacementRuleCallbacks);
+
+        return [];
     }
 
     /**
@@ -86,16 +171,5 @@ class Route extends TemplateAbstract
     public function getRoutePath() : string
     {
         return $this->routePath;
-    }
-
-    /**
-     * @param string $routePath
-     * @return Route
-     */
-    public function setRoutePath(string $routePath) : Route
-    {
-        $this->routePath = $routePath;
-
-        return $this;
     }
 }

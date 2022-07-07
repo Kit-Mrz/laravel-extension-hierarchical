@@ -23,6 +23,7 @@ class {{RNT}}Controller extends Controller
     public function __construct({{RNT}}Service ${{RNT}}Service)
     {
         $tenantId = ToolHelper::do()->activeUser()->getTenantId();
+
         $this->{{RNT}}Service = ${{RNT}}Service->setFactorId($tenantId)->setTenantId($tenantId);
     }
 

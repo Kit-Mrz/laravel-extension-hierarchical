@@ -2,61 +2,108 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates;
 
-use InvalidArgumentException;
-use Mrzkit\LaravelExtensionHierarchical\CodeTemplate;
-use Mrzkit\LaravelExtensionHierarchical\TableParser;
+use Mrzkit\LaravelExtensionHierarchical\NewTableParser;
+use Mrzkit\LaravelExtensionHierarchical\TableInformation;
 use Mrzkit\LaravelExtensionHierarchical\TemplateAbstract;
+use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\TemplateCreatorContract;
 
-class ModelRepositoryComplex extends TemplateAbstract
+class ModelRepositoryComplex extends TemplateAbstract implements TemplateCreatorContract
 {
-    public function __construct(string $name)
+    /**
+     * @var string 数据表名称
+     */
+    private $tableName;
+
+    /**
+     * @var NewTableParser 数据表解析器
+     */
+    private $tableParser;
+
+    public function __construct(string $tableName, string $tablePrefix = '')
     {
-        $parser       = new TableParser($name, env('DB_PREFIX'));
-        $codeTemplate = new CodeTemplate();
+        $this->tableName   = $tableName;
+        $this->tablePrefix = $tablePrefix;
+        $this->tableParser = new NewTableParser(new TableInformation($tableName, $tablePrefix));
+    }
 
-        $codeTplItem     = $codeTemplate->codeTplItem($parser->getUnionFields());
-        $codeTplItemHump = $codeTemplate->codeTplItemHump($parser->getUnionFields());
-        $codeTplItemIf   = $codeTemplate->codeTplItemIf($parser->getUnionFields());
+    /**
+     * @return string
+     */
+    public function getTableName() : string
+    {
+        return $this->tableName;
+    }
 
-        $pattern = '/^\w+$/';
+    /**
+     * @return NewTableParser
+     */
+    public function getTableParser() : NewTableParser
+    {
+        return $this->tableParser;
+    }
 
-        if ( !preg_match($pattern, $name, $matches)) {
-            throw new InvalidArgumentException("Match fail : {$name}");
-        }
+    /**
+     * @return string
+     */
+    public function getTablePrefix() : string
+    {
+        return $this->tablePrefix;
+    }
+
+    /**
+     * @desc
+     * @return string[]
+     */
+    public function getIgnoreFields() : array
+    {
+        return [
+            "deletedBy", "deletedAt",
+            "deleted_by", "deleted_at",
+        ];
+    }
+
+    public function handle() : array
+    {
+        $parser = $this->getTableParser();
+
+        $tableName = $parser->getRenderTableName();
+
+        $handleOutputString = $parser->getHandleOutputRender($this->getIgnoreFields());
+
+        $handleOutputRelationString = $parser->getHandleOutputRender($this->getIgnoreFields(), false);
 
         // 是否强制覆盖: true=覆盖,false=不覆盖
         $forceCover = false;
 
         // 保存目录
-        $saveDirectory = app()->basePath("app/Repositories/{$name}");
+        $saveDirectory = app()->basePath("app/Repositories/{$tableName}");
 
         // 保存文件名称
-        $saveFilename = $saveDirectory . '/' . $name . 'RepositoryComplex.php';
+        $saveFilename = $saveDirectory . '/' . $tableName . 'RepositoryComplex.php';
 
         // 模板文件
         $sourceTemplateFile = __DIR__ . '/tpl/ModelRepositoryComplex.tpl';
 
         // 替换规则
         $replacementRules = [
-            '/{{RNT}}/'                => $name,
-            '/{{CODE_TPL_ITEM}}/'      => $codeTplItem,
-            '/{{CODE_TPL_ITEM_HUMP}}/' => $codeTplItemHump,
-            '/{{CODE_TPL_ITEM_IF}}/'   => $codeTplItemIf,
+            '/{{RNT}}/'                => $tableName,
+            '/{{CODE_TPL_ITEM}}/'      => $handleOutputString,
+            '/{{CODE_TPL_ITEM_HUMP}}/' => $handleOutputRelationString,
         ];
 
         // 替换规则-回调
         $replacementRuleCallbacks = [
             '/(\->)(\\$)(\w+)/' => function ($match){
-                $symbol   = $match[1];
-                $name     = $match[3];
-                $humpName = strtolower(substr($name, 0, 2)) . substr($name, 2);
+                $symbol    = $match[1];
+                $tableName = $match[3];
+                $humpName  = strtolower(substr($tableName, 0, 2)) . substr($tableName, 2);
 
                 return $symbol . $humpName;
             },
             '/(\\$)(\w+)/'      => function ($match){
                 $symbolDollar = $match[1];
-                $name         = $match[2];
-                $humpName     = strtolower(substr($name, 0, 1)) . substr($name, 1);
+                $tableName    = $match[2];
+                $humpName     = strtolower(substr($tableName, 0, 1)) . substr($tableName, 1);
 
                 return $symbolDollar . $humpName;
             },
@@ -68,5 +115,7 @@ class ModelRepositoryComplex extends TemplateAbstract
             ->setSourceTemplateFile($sourceTemplateFile)
             ->setReplacementRules($replacementRules)
             ->setReplacementRuleCallbacks($replacementRuleCallbacks);
+
+        return [];
     }
 }

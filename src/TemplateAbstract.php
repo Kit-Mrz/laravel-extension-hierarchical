@@ -2,7 +2,7 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical;
 
-class TemplateAbstract implements TemplateContract
+abstract class TemplateAbstract implements TemplateContract
 {
     /**
      * @var bool 是否强制覆盖: true=覆盖,false=不覆盖

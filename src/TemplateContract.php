@@ -33,4 +33,10 @@ interface TemplateContract
      * @return string[]
      */
     public function getReplacementRuleCallbacks() : array;
+
+    /**
+     * @desc
+     * @return array
+     */
+    public function handle() : array;
 }

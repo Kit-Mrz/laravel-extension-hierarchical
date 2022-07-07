@@ -9,75 +9,91 @@ use InvalidArgumentException;
 
 class TableParser
 {
-    /**
-     * @var string 表名
-     */
-    protected $tableName = '';
-
-    /**
-     * @var string 表前缀
-     */
+    /** @var string 表前缀 */
     protected $prefix = '';
 
-    /**
-     * @var string 全表名
-     */
+    /** @var string 表名 */
+    protected $tableName = '';
+
+    /** @var string 全表名 */
     protected $fullTableName = '';
 
-    /**
-     * @var array 字段
-     */
+    /** @var array 字段 */
     protected $fields = [];
-    /**
-     * @var array 全列详细信息
-     */
+
+    /** @var array 全列详细信息 */
     protected $fullColumns = [];
+
+    /** @var bool 是否分表 */
+    protected $isShard;
 
     public function __construct(string $tableName, string $prefix = '')
     {
-        $this->setTableName(Str::snake($tableName));
+        $this->prefix        = $prefix;
+        $this->tableName     = $tableName;
+        $this->fullTableName = $this->prefix . $this->tableName;
+        $this->isShard       = false;
 
-        $this->prefix = $prefix;
-
-        $this->hasTable();
-
-        $this->fullTableName = $this->getPrefix() . $this->getTableName();
-
-        $this->setTableName(Str::snake($tableName));
-
-        $this->setFullColumns();
-
-        $this->setFields();
+        $this->initTable();
+        $this->initFullColumns();
+        $this->initFields();
     }
 
     /**
      * @desc 检测表是否存在
-     * @return bool
      */
-    public function hasTable() : bool
+    public function initTable()
     {
-        $tableName = $this->getTableName();
+        // 前缀也处理
+        $this->prefix = strlen($this->prefix) > 0 ? Str::snake($this->prefix) : $this->prefix;
+        // 原始表名
+        $tableName = Str::snake($this->getTableName());
+        // 猜测表名
+        $tableName4   = $tableName . '_4';
+        $tableName8   = $tableName . '_8';
+        $tableName16  = $tableName . '_16';
+        $tableName32  = $tableName . '_32';
+        $tableName48  = $tableName . '_48';
+        $tableName64  = $tableName . '_64';
+        $tableName128 = $tableName . '_128';
 
-        $tableName16 = $tableName . '_16';
-
-        $tableName32 = $tableName . '_32';
-
-        switch (true) {
-            case Schema::hasTable($tableName):
-                $this->setTableName($tableName);
-
-                return true;
-            case Schema::hasTable($tableName16):
-                $this->setTableName($tableName16);
-
-                return true;
-            case Schema::hasTable($tableName32):
-                $this->setTableName($tableName32);
-
-                return true;
-            default:
-                throw new InvalidArgumentException("Not exists table: {$tableName}, {$tableName16}, {$tableName32}.");
+        if (Schema::hasTable($tableName)) {
+            $this->tableName     = Str::snake($tableName);
+            $this->fullTableName = Str::snake($this->prefix . $this->tableName);
+            $this->isShard       = false;
+        } else if (Schema::hasTable($tableName4)) {
+            $this->tableName     = Str::snake($tableName4);
+            $this->fullTableName = Str::snake($this->prefix . $this->tableName);
+            $this->isShard       = true;
+        } else if (Schema::hasTable($tableName8)) {
+            $this->tableName     = Str::snake($tableName8);
+            $this->fullTableName = Str::snake($this->prefix . $this->tableName);
+            $this->isShard       = true;
+        } else if (Schema::hasTable($tableName16)) {
+            $this->tableName     = Str::snake($tableName16);
+            $this->fullTableName = Str::snake($this->prefix . $this->tableName);
+            $this->isShard       = true;
+        } else if (Schema::hasTable($tableName32)) {
+            $this->tableName     = Str::snake($tableName32);
+            $this->fullTableName = Str::snake($this->prefix . $this->tableName);
+            $this->isShard       = true;
+        } else if (Schema::hasTable($tableName48)) {
+            $this->tableName     = Str::snake($tableName48);
+            $this->fullTableName = Str::snake($this->prefix . $this->tableName);
+            $this->isShard       = true;
+        } else if (Schema::hasTable($tableName64)) {
+            $this->tableName     = Str::snake($tableName64);
+            $this->fullTableName = Str::snake($this->prefix . $this->tableName);
+            $this->isShard       = true;
+        } else if (Schema::hasTable($tableName128)) {
+            $this->tableName     = Str::snake($tableName128);
+            $this->fullTableName = Str::snake($this->prefix . $this->tableName);
+            $this->isShard       = true;
+        } else {
+            throw new InvalidArgumentException("Not exists table.");
         }
+
+        return $this;
     }
 
     /**
@@ -128,7 +144,7 @@ class TableParser
         $fields = [];
 
         foreach ($this->getFields() as $item) {
-            $fields[$item]['under'] = $item;
+            $fields[$item]['under'] = Str::snake($item);
             $fields[$item]['hump']  = Str::camel($item);
         }
 
@@ -148,7 +164,7 @@ class TableParser
      * @desc 提取字段
      * @return $this
      */
-    public function setFields()
+    public function initFields()
     {
         $fields = [];
 
@@ -188,11 +204,11 @@ class TableParser
      * @desc 查询表信息
      * @return $this
      */
-    public function setFullColumns()
+    public function initFullColumns()
     {
         $tableName = $this->getFullTableName();
 
-        $sql = "SHOW FULL COLUMNS FROM {$tableName}";
+        $sql = "SHOW FULL COLUMNS FROM `{$tableName}`";
 
         // 原生 SQL 要带上表前缀
         $resultSets = DB::select($sql);
@@ -213,8 +229,6 @@ class TableParser
 
         return $this;
     }
-
-    // 获取字段的数组字符串，带表字段注释
 
     /**
      * @desc 获取字符(字符串)
