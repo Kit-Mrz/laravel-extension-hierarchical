@@ -14,7 +14,10 @@ Route::group(
             ]
         );
 
-        $router->post('{{LOWER_ROUTE_NAME}}-ext/many', [{{NAMESPACE_PATH}}\{{RNT}}Controls\{{RNT}}Controller::class, 'many'])->name(Decorate::do()->external('{{RNT}}获取'));
+        $router->post('{{LOWER_ROUTE_NAME}}-ext/many', [{{NAMESPACE_PATH}}\{{RNT}}Controls\{{RNT}}Controller::class, 'many'])->name(Decorate::do()->external('{{RNT}}批量获取'));
+        $router->post('{{LOWER_ROUTE_NAME}}-ext/many-destroy', [{{NAMESPACE_PATH}}\{{RNT}}Controls\{{RNT}}Controller::class, 'manyDestroy'])->name(Decorate::do()->external('{{RNT}}批量删除'));
+        $router->post('{{LOWER_ROUTE_NAME}}-ext/many-store', [{{NAMESPACE_PATH}}\{{RNT}}Controls\{{RNT}}Controller::class, 'manyStore'])->name(Decorate::do()->external('{{RNT}}批量保存'));
+        $router->post('{{LOWER_ROUTE_NAME}}-ext/many-update', [{{NAMESPACE_PATH}}\{{RNT}}Controls\{{RNT}}Controller::class, 'manyUpdate'])->name(Decorate::do()->external('{{RNT}}批量更新'));
 });
 
 //{{HERE}}
