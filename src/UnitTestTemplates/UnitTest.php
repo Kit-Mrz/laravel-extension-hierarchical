@@ -65,6 +65,18 @@ class UnitTest extends TemplateAbstract implements TemplateCreatorContract
     }
 
     /**
+     * @desc
+     * @return string[]
+     */
+    public function getIgnoreFields() : array
+    {
+        return [
+            "id", "createdBy", "createdAt", "updatedBy", "updatedAt", "deletedBy", "deletedAt",
+            "id", "created_by", "created_at", "updated_by", "updated_at", "deleted_by", "deleted_at",
+        ];
+    }
+
+    /**
      * @return string
      */
     public function getTablePrefix() : string
@@ -94,6 +106,17 @@ class UnitTest extends TemplateAbstract implements TemplateCreatorContract
 
         //********************************************************
 
+        $parser = $this->getTableParser();
+
+        $repositoryName = $parser->getRenderTableName();
+
+        $updateCodeString = $parser->updateCodeTemplate($this->getIgnoreFields());
+        $storeCodeString  = $parser->storeCodeTemplate($this->getIgnoreFields());
+
+        $unitTestStoreCodeTemplate = $parser->unitTestStoreCodeTemplate($this->getIgnoreFields());
+
+        //********************************************************
+
         // 是否强制覆盖: true=覆盖,false=不覆盖
         $forceCover = false;
 
@@ -111,9 +134,10 @@ class UnitTest extends TemplateAbstract implements TemplateCreatorContract
 
         // 替换规则
         $replacementRules = [
-            '/{{NAMESPACE_PATH}}/' => $namespacePath,
-            '/{{RNT}}/'            => $controlName,
-            '/{{RNT_ROUTE_PATH}}/' => Str::snake($controlName, '-'),
+            '/{{NAMESPACE_PATH}}/'       => $namespacePath,
+            '/{{RNT}}/'                  => $controlName,
+            '/{{RNT_ROUTE_PATH}}/'       => Str::snake($controlName, '-'),
+            '/{{UNIT_TEST_STORE_CODE}}/' => $unitTestStoreCodeTemplate,
         ];
 
         // 替换规则-回调

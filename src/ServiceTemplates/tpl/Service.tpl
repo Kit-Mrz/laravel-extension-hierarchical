@@ -269,6 +269,10 @@ class {{RNT}}Service implements ControlServiceContract
         foreach ($inputParams as $params) {
             $data = [];
 
+             if (isset($param["id"])) {
+                $data["_id"] = (int) $params["id"];
+            }
+
             {{CODE_TPL_UPDATE}}
 
             if ( !empty($data)) {

@@ -37,10 +37,7 @@ class {{RNT}}ControllerTest extends BaseTest
     public function testStore()
     {
         $data = [
-            "tenantId" => 1,
-            "name"     => "jack",
-            "type"     => 1,
-            "color"    => "FFEEFF",
+            {{UNIT_TEST_STORE_CODE}}
         ];
 
         $uri = "/{{RNT_ROUTE_PATH}}";
@@ -80,10 +77,7 @@ class {{RNT}}ControllerTest extends BaseTest
         $id = 2;
 
         $data = [
-            "tenantId" => 1,
-            "name"     => "jack",
-            "type"     => 1,
-            "color"    => "FFEEFF",
+            {{UNIT_TEST_STORE_CODE}}
         ];
 
         $uri = "/{{RNT_ROUTE_PATH}}/{$id}";
@@ -165,16 +159,7 @@ class {{RNT}}ControllerTest extends BaseTest
         $data = [
             "batch" => [
                 [
-                    "tenantId" => 1,
-                    "name"     => "jack1",
-                    "type"     => 1,
-                    "color"    => "FFEEFF",
-                ],
-                [
-                    "tenantId" => 1,
-                    "name"     => "jack2",
-                    "type"     => 2,
-                    "color"    => "FFEEFF",
+                   {{UNIT_TEST_STORE_CODE}}
                 ],
             ],
 
@@ -199,18 +184,8 @@ class {{RNT}}ControllerTest extends BaseTest
         $data = [
             "batch" => [
                 [
-                    "id"       => 4,
-                    "tenantId" => 1,
-                    "name"     => "jingjing1",
-                    "type"     => 1,
-                    "color"    => "F2F1F1",
-                ],
-                [
-                    "id"       => 5,
-                    "tenantId" => 1,
-                    "name"     => "jingjing2",
-                    "type"     => 2,
-                    "color"    => "F1F1F1",
+                    "id" => 0,
+                   {{UNIT_TEST_STORE_CODE}}
                 ],
             ],
 
