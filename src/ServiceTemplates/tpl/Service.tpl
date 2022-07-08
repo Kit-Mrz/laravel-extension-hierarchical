@@ -76,7 +76,7 @@ class {{RNT}}Service implements ControlServiceContract
      * @param array $params 数据
      * @return array
      */
-    public function store(array $params) : array
+    public function store(array $row) : array
     {
         $inputParams = [
             {{CODE_TPL_STORE}}
