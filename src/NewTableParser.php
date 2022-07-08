@@ -43,19 +43,96 @@ class NewTableParser
         return $tableName;
     }
 
-    public function getHandleOutputRender(array $ignoreFields = [], bool $camelFirst = true) : string
+    public function updateCodeTemplate(array $ignoreFields = []) : string
     {
         $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
 
-        $fieldString = "";
+        $template = "
+            if (isset(\$params[\"%s\"])) {
+                \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %d);
+            }
+        ";
 
+        $codeString = "";
         foreach ($tableFullColumns as $column) {
             if (in_array($column->Field, $ignoreFields)) {
                 continue;
             }
+
+            $snakeField = Str::snake($column->Field);
+            $camelField = Str::camel($column->Field);
+
             //****
             $matcher = new DataTypeMatcher($column->Field, $column->Type, $column->Comment);
+            if ( !empty($matcher->matchInt())) {
+                $template = '"%s" => %s ($row["%s"] ?? %d),%s';
+                $template = "
+                    if (isset(\$params[\"%s\"])) {
+                        \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %d);
+                    }
+                ";
+                $type     = "(int)";
+                $val      = 0;
+            } else if ( !empty($matcher->matchFloat())) {
+                $template = '"%s" => %s ($row["%s"] ?? %2f),%s';
+                $template = "
+                    if (isset(\$params[\"%s\"])) {
+                        \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %2f);
+                    }
+                ";
+                $type     = "(double)";
+                $val      = 0.00;
+            } else if ( !empty($matcher->matchString())) {
+                $template = "
+                    if (isset(\$params[\"%s\"])) {
+                        \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %s);
+                    }
+                ";
+                $type     = "(string)";
+                $val      = "\"\"";
+            } else if ( !empty($matcher->matchDate())) {
+                $template = "
+                    if (isset(\$params[\"%s\"])) {
+                        \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %s);
+                    }
+                ";
+                $type     = "";
+                $val      = "null";
+            } else {
+                $template = "
+                    if (isset(\$params[\"%s\"])) {
+                        \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %s),;
+                    }
+                ";
+                $type     = "(string)";
+                $val      = "";
+            }
+            $codeString .= sprintf($template, $camelField, $snakeField, $type, $camelField, $val, "\r\n");
+            //****
+        }
 
+        return $codeString;
+    }
+
+    /**
+     * @desc 代码模板
+     * @param array $fields
+     * @return string
+     */
+    public function storeCodeTemplate(array $ignoreFields = []) : string
+    {
+        $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
+
+        $codeString = "";
+        foreach ($tableFullColumns as $column) {
+            if (in_array($column->Field, $ignoreFields)) {
+                continue;
+            }
+            $snakeField = Str::snake($column->Field);
+            $camelField = Str::camel($column->Field);
+
+            //****
+            $matcher = new DataTypeMatcher($column->Field, $column->Type, $column->Comment);
             if ( !empty($matcher->matchInt())) {
                 $template = '"%s" => %s ($row["%s"] ?? %d),%s';
                 $type     = "(int)";
@@ -77,7 +154,46 @@ class NewTableParser
                 $type     = "(string)";
                 $val      = "";
             }
+            $codeString .= sprintf($template, $snakeField, $type, $camelField, $val, "\r\n");
+            //****
+        }
 
+        return $codeString;
+    }
+
+    public function getHandleOutputRender(array $ignoreFields = [], bool $camelFirst = true) : string
+    {
+        $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
+
+        $fieldString = "";
+
+        foreach ($tableFullColumns as $column) {
+            if (in_array($column->Field, $ignoreFields)) {
+                continue;
+            }
+            //****
+            $matcher = new DataTypeMatcher($column->Field, $column->Type, $column->Comment);
+            if ( !empty($matcher->matchInt())) {
+                $template = '"%s" => %s ($row["%s"] ?? %d),%s';
+                $type     = "(int)";
+                $val      = 0;
+            } else if ( !empty($matcher->matchFloat())) {
+                $template = '"%s" => %s ($row["%s"] ?? %2f),%s';
+                $type     = "(double)";
+                $val      = 0.00;
+            } else if ( !empty($matcher->matchString())) {
+                $template = '"%s" => %s ($row["%s"] ?? %s),%s';
+                $type     = "(string)";
+                $val      = "\"\"";
+            } else if ( !empty($matcher->matchDate())) {
+                $template = '"%s" => %s ($row["%s"] ?? %s),%s';
+                $type     = "";
+                $val      = "null";
+            } else {
+                $template = '"%s" => %s ($row["%s"] ?? %s),%s';
+                $type     = "(string)";
+                $val      = "";
+            }
             //****
 
             $field      = $column->Field;

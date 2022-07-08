@@ -5,6 +5,7 @@ namespace Mrzkit\LaravelExtensionHierarchical\TemplateCreators;
 use Mrzkit\LaravelExtensionHierarchical\ServiceTemplates\BusinessService;
 use Mrzkit\LaravelExtensionHierarchical\ServiceTemplates\Service;
 use Mrzkit\LaravelExtensionHierarchical\ServiceTemplates\ServiceFactory;
+use Mrzkit\LaravelExtensionHierarchical\ServiceTemplates\RenderService;
 use Mrzkit\LaravelExtensionHierarchical\TemplateContract;
 use Mrzkit\LaravelExtensionHierarchical\TemplateHandler;
 
@@ -38,31 +39,36 @@ class ServiceTemplateCreator implements TemplateCreatorContract
         $this->templateHandler = new TemplateHandler();
     }
 
-    protected function createBusinessService() : TemplateContract
-    {
-        return new BusinessService($this->name);
-    }
-
     protected function createService() : TemplateContract
     {
-        return new Service($this->name);
+        return new Service($this->controlName, $this->tableName, $this->tablePrefix);
+    }
+
+    protected function createBusinessService() : TemplateContract
+    {
+        return new BusinessService($this->controlName, $this->tableName, $this->tablePrefix);
     }
 
     protected function createServiceFactory() : TemplateContract
     {
-        return new ServiceFactory($this->name);
+        return new ServiceFactory($this->controlName, $this->tableName, $this->tablePrefix);
+    }
+
+    protected function createRenderService() : TemplateContract
+    {
+        return new RenderService($this->controlName, $this->tableName, $this->tablePrefix);
     }
 
     public function handle() : array
     {
         $result = [];
 
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createBusinessService());
+        $templateHandler = $this->templateHandler->setTemplateContract($this->createService());
         $result[]        = [
             'result'       => $templateHandler->execute(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createService());
+        $templateHandler = $this->templateHandler->setTemplateContract($this->createBusinessService());
         $result[]        = [
             'result'       => $templateHandler->execute(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
@@ -72,6 +78,12 @@ class ServiceTemplateCreator implements TemplateCreatorContract
             'result'       => $templateHandler->execute(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
+        $templateHandler = $this->templateHandler->setTemplateContract($this->createRenderService());
+        $result[]        = [
+            'result'       => $templateHandler->execute(),
+            'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
+        ];
+
 
         return $result;
     }

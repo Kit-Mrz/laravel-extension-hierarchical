@@ -97,7 +97,7 @@ class Controller extends TemplateAbstract implements TemplateCreatorContract
         $forceCover = false;
 
         // 保存目录
-        $saveDirectory = app()->basePath("app/Http/Controllers/{$directoryPath}/{$controlName}Controls");
+        $saveDirectory = app()->basePath("app/Http/Controllers/{$directoryPath}{$controlName}Controls");
 
         // 保存文件名称
         $saveFilename = $saveDirectory . '/' . $controlName . 'Controller.php';

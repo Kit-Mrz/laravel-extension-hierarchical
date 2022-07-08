@@ -71,6 +71,18 @@ class BusinessService extends TemplateAbstract implements TemplateCreatorContrac
         return $this->tablePrefix;
     }
 
+    /**
+     * @desc
+     * @return string[]
+     */
+    public function getIgnoreFields() : array
+    {
+        return [
+            "id", "createdBy", "createdAt", "updatedBy", "updatedAt", "deletedBy", "deletedAt",
+            "id", "created_by", "created_at", "updated_by", "updated_at", "deleted_by", "deleted_at",
+        ];
+    }
+
     public function handle() : array
     {
         $fullControlName = $this->getControlName();
@@ -93,11 +105,22 @@ class BusinessService extends TemplateAbstract implements TemplateCreatorContrac
 
         //********************************************************
 
+        $parser = $this->getTableParser();
+
+        $repositoryName = $parser->getRenderTableName();
+
+        $updateCodeString = $parser->updateCodeTemplate($this->getIgnoreFields());
+
+        // 数据仓库名称
+        $repository = "{$repositoryName}Repository";
+
+        //********************************************************
+
         // 是否强制覆盖: true=覆盖,false=不覆盖
         $forceCover = false;
 
         // 保存目录
-        $saveDirectory = app()->basePath("app/Services/{$namespacePath}/{$controlName}");
+        $saveDirectory = app()->basePath("app/Services/{$directoryPath}{$controlName}");
 
         // 保存文件名称
         $saveFilename = $saveDirectory . '/' . $controlName . 'BusinessService.php';

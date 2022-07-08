@@ -6,6 +6,7 @@ use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\ControllerTemplateCreat
 use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\RepositoryTemplateCreator;
 use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\RequestTemplateCreator;
 use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\RouteTemplateCreator;
+use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\ServiceTemplateCreator;
 
 class Tester
 {
@@ -29,7 +30,9 @@ class Tester
 //        dump($creator->handle());
 //        $creator = new ControllerTemplateCreator($params["controls"], $params["tableName"], $params["prefix"]);
 //        dump($creator->handle());
-        $creator = new RouteTemplateCreator($params["controls"], $params["tableName"], $params["prefix"]);
+//        $creator = new RouteTemplateCreator($params["controls"], $params["tableName"], $params["prefix"]);
+//        dump($creator->handle());
+        $creator = new ServiceTemplateCreator($params["controls"], $params["tableName"], $params["prefix"]);
         dump($creator->handle());
     }
 

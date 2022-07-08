@@ -2,6 +2,7 @@
 
 namespace App\Services\{{NAMESPACE_PATH}}\{{RNT}};
 
+use App\Cache\CacheManagerFactory;
 use App\Components\Back\Back;
 use App\Exceptions\Business\EmptyException;
 use App\Exceptions\Business\InvalidArgumentException;
@@ -35,9 +36,9 @@ class {{RNT}}Service implements ControlServiceContract
             "orderType" => (string) ($params['orderType'] ?? "-id"),
         ];
 
-        $cacheKey = "{{RNT}}Service:index";
+        $cacheKey = CacheManagerFactory::getManager()->rta($this->getTenantId(), __METHOD__, $inputParams);
 
-        $list = Cache::remember($cacheKey, 1, function () use($inputParams) {
+        $list = Cache::remember($cacheKey, 2, function () use($inputParams) {
             //
             $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}();
 
@@ -59,13 +60,11 @@ class {{RNT}}Service implements ControlServiceContract
                 }
             });
 
-            $list = Back::do()->retrieveIterator($paginator, function ({{REPOSITORY_NAME}} $object){
-                //
-                $row = $object->toArray();
-                //
-                $item = {{REPOSITORY}}::handleOutput($row);
+            $renderService = {{RNT}}ServiceFactory::get{{RNT}}RenderService();
 
-                return $item;
+            $list = Back::do()->retrieveIterator($paginator, function ({{REPOSITORY_NAME}} $object) use ($renderService){
+                //
+               return $render->handle($object);
             });
 
             return $list;
@@ -103,11 +102,9 @@ class {{RNT}}Service implements ControlServiceContract
 
         $object = $this->info($id, $fields);
 
-        $row = $object->toArray();
+        $renderService = {{RNT}}ServiceFactory::get{{RNT}}RenderService();
 
-        $item = {{REPOSITORY}}::handleOutput($row);
-
-        return $item;
+        return $renderService->handle($object);
     }
 
     /**
@@ -195,9 +192,10 @@ class {{RNT}}Service implements ControlServiceContract
 
         $list = [];
 
-        foreach ($objects->getIterator() as $row) {
-            $row    = $row->toArray();
-            $list[] = {{REPOSITORY}}::handleOutput($row);
+        $renderService = {{RNT}}ServiceFactory::get{{RNT}}RenderService();
+
+        foreach ($objects->getIterator() as $object) {
+            $list[] = $renderService->handle($object);
         }
 
         return $list;

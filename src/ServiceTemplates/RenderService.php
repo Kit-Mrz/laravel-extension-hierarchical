@@ -8,7 +8,7 @@ use Mrzkit\LaravelExtensionHierarchical\TemplateAbstract;
 use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\TemplateCreatorContract;
 use Mrzkit\LaravelExtensionHierarchical\TemplateTool;
 
-class Service extends TemplateAbstract implements TemplateCreatorContract
+class RenderService extends TemplateAbstract implements TemplateCreatorContract
 {
     use TemplateTool;
 
@@ -124,17 +124,17 @@ class Service extends TemplateAbstract implements TemplateCreatorContract
         $saveDirectory = app()->basePath("app/Services/{$directoryPath}{$controlName}");
 
         // 保存文件名称
-        $saveFilename = $saveDirectory . '/' . $controlName . 'Service.php';
+        $saveFilename = $saveDirectory . '/' . $controlName . 'RenderService.php';
 
         // 模板文件
-        $sourceTemplateFile = __DIR__ . '/tpl/Service.tpl';
+        $sourceTemplateFile = __DIR__ . '/tpl/RenderService.tpl';
 
         // 替换规则
         $replacementRules = [
             '/{{NAMESPACE_PATH}}/'  => $namespacePath,
             '/{{RNT}}/'             => $controlName,
-            '/{{CODE_TPL_UPDATE}}/' => $updateCodeString,
-            '/{{CODE_TPL_STORE}}/'  => $storeCodeString,
+            //            '/{{CODE_TPL_UPDATE}}/' => $updateCodeString,
+            //            '/{{CODE_TPL_STORE}}/'  => $storeCodeString,
             '/{{REPOSITORY}}/'      => $repository,
             '/{{REPOSITORY_NAME}}/' => $repositoryName,
         ];
