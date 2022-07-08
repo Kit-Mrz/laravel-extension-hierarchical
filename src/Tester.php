@@ -35,25 +35,25 @@ class Tester
             "controls"  => "CpcSystem.Tag",
         ];
 
-        // UnitTest
+//         UnitTest
         $creator = new UnitTestTemplateCreator($params["controls"], $params["tableName"], $params["prefix"]);
         dump($creator->handle());
 
 //        // Repository
 //        $creator = new RepositoryTemplateCreator($params["tableName"], $params["prefix"]);
 //        dump($creator->handle());
-//        // Service
-//        $creator = new ServiceTemplateCreator($params["controls"], $params["tableName"], $params["prefix"], $params["shard"]);
-//        dump($creator->handle());
-//        // Controller
-//        $creator = new ControllerTemplateCreator($params["controls"], $params["tableName"], $params["prefix"]);
-//        dump($creator->handle());
-//        // Request
-//        $creator = new RequestTemplateCreator($params["controls"], $params["tableName"], $params["prefix"]);
-//        dump($creator->handle());
-//        // Route
-//        $creator = new RouteTemplateCreator($params["controls"], $params["tableName"], $params["prefix"]);
-//        dump($creator->handle());
+        // Service
+        $creator = new ServiceTemplateCreator($params["controls"], $params["tableName"], $params["prefix"], $params["shard"]);
+        dump($creator->handle());
+        // Controller
+        $creator = new ControllerTemplateCreator($params["controls"], $params["tableName"], $params["prefix"]);
+        dump($creator->handle());
+        // Request
+        $creator = new RequestTemplateCreator($params["controls"], $params["tableName"], $params["prefix"]);
+        dump($creator->handle());
+        // Route
+        $creator = new RouteTemplateCreator($params["controls"], $params["tableName"], $params["prefix"]);
+        dump($creator->handle());
         // Component
 //        $creator = new ComponentCreator("Util");
 //        dump($creator->handle());

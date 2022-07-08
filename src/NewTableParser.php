@@ -285,7 +285,7 @@ class NewTableParser
      * @param array $ignoreFields
      * @return RequestTemplateRenderContract
      */
-    public function getStoreTemplateRender(array $ignoreFields = []) : RequestTemplateRenderContract
+    public function getStoreTemplateRender(array $ignoreFields = [], bool $isBatch = false) : RequestTemplateRenderContract
     {
         $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
 
@@ -305,19 +305,25 @@ class NewTableParser
 
         $messageString = "";
 
+        $batchTemplate = "";
+
+        if ($isBatch) {
+            $batchTemplate = "batch.*.";
+        }
+
         foreach ($dataTypeMatchers as $matcher) {
             $matchResult = $matcher->matchInt();
             if ( !empty($matchResult)) {
                 //
                 $field = Str::camel($matcher->getField());
                 // Rule
-                $template   = '"%s"  => "required|integer|between:%d,%d",%s';
-                $ruleString .= sprintf($template, $field, $matchResult["min"], $matchResult["max"], "\r\n");
+                $template   = '"%s%s"  => "required|integer|between:%d,%d",%s';
+                $ruleString .= sprintf($template, $batchTemplate, $field, $matchResult["min"], $matchResult["max"], "\r\n");
 
                 // Message
-                $messageString .= "\"{$field}.required\" => \"缺少 {$field} 字段\",\r\n";
-                $messageString .= "\"{$field}.integer\" => \"字段 {$field} 格式错误\",\r\n";
-                $messageString .= "\"{$field}.between\" => \"字段 {$field} 超出范围\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.required\" => \"缺少 {$field} 字段\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.integer\" => \"字段 {$field} 格式错误\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.between\" => \"字段 {$field} 超出范围\",\r\n";
 
                 continue;
             }
@@ -327,12 +333,12 @@ class NewTableParser
                 //
                 $field = Str::camel($matcher->getField());
                 // Rule
-                $template   = '"%s"  => "required|numeric",%s';
-                $ruleString .= sprintf($template, $field, "\r\n");
+                $template   = '"%s%s"  => "required|numeric",%s';
+                $ruleString .= sprintf($template, $batchTemplate,$field, "\r\n");
 
                 // Message
-                $messageString .= "\"{$field}.required\" => \"缺少 {$field} 字段\",\r\n";
-                $messageString .= "\"{$field}.numeric\" => \"字段 {$field} 格式错误\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.required\" => \"缺少 {$field} 字段\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.numeric\" => \"字段 {$field} 格式错误\",\r\n";
 
                 continue;
             }
@@ -342,12 +348,12 @@ class NewTableParser
                 //
                 $field = Str::camel($matcher->getField());
                 // Rule
-                $template   = '"%s" => "required|string|nullable|between:%d,%d",%s';
-                $ruleString .= sprintf($template, $field, $matchResult["min"], $matchResult["max"], "\r\n");
+                $template   = '"%s%s" => "required|string|nullable|between:%d,%d",%s';
+                $ruleString .= sprintf($template, $batchTemplate,$field, $matchResult["min"], $matchResult["max"], "\r\n");
                 // Message
-                $messageString .= "\"{$field}.required\" => \"缺少 {$field} 字段\",\r\n";
-                $messageString .= "\"{$field}.string\" => \"字段 {$field} 格式错误\",\r\n";
-                $messageString .= "\"{$field}.between\" => \"字段 {$field} 超出范围\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.required\" => \"缺少 {$field} 字段\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.string\" => \"字段 {$field} 格式错误\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.between\" => \"字段 {$field} 超出范围\",\r\n";
 
                 continue;
             }
@@ -357,11 +363,11 @@ class NewTableParser
                 //
                 $field = Str::camel($matcher->getField());
                 // Rule
-                $template   = '"%s" => "required|date|nullable",%s';
-                $ruleString .= sprintf($template, $field, "\r\n");
+                $template   = '"%s%s" => "required|date|nullable",%s';
+                $ruleString .= sprintf($template, $batchTemplate,$field, "\r\n");
                 // Message
-                $messageString .= "\"{$field}.required\" => \"缺少 {$field} 字段\",\r\n";
-                $messageString .= "\"{$field}.date\" => \"字段 {$field} 日期格式错误\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.required\" => \"缺少 {$field} 字段\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.date\" => \"字段 {$field} 日期格式错误\",\r\n";
 
                 continue;
             }
@@ -369,10 +375,10 @@ class NewTableParser
             // 匹配不到类型
             $field = Str::camel($matcher->getField());
             // Rule
-            $template   = '"%s" => "string|nullable",%s';
-            $ruleString .= sprintf($template, $field, "\r\n");
+            $template   = '"%s%s" => "string|nullable",%s';
+            $ruleString .= sprintf($template, $batchTemplate,$field, "\r\n");
             // Message
-            $messageString .= "\"{$field}.string\" => \"字段 {$field} 格式错误\",\r\n";
+            $messageString .= "\"{$batchTemplate}{$field}.string\" => \"字段 {$field} 格式错误\",\r\n";
         }
 
         $ruleString = "return[\r\n{$ruleString}\r\n];";
@@ -389,7 +395,7 @@ class NewTableParser
      * @param array $ignoreFields
      * @return RequestTemplateRenderContract
      */
-    public function getUpdateTemplateRender(array $ignoreFields = []) : RequestTemplateRenderContract
+    public function getUpdateTemplateRender(array $ignoreFields = [], bool $isBatch = false) : RequestTemplateRenderContract
     {
         $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
 
@@ -409,18 +415,24 @@ class NewTableParser
 
         $messageString = "";
 
+        $batchTemplate = "";
+
+        if ($isBatch) {
+            $batchTemplate = "batch.*.";
+        }
+
         foreach ($dataTypeMatchers as $matcher) {
             $matchResult = $matcher->matchInt();
             if ( !empty($matchResult)) {
                 //
                 $field = Str::camel($matcher->getField());
                 // Rule
-                $template   = '"%s"  => "integer|between:%d,%d",%s';
-                $ruleString .= sprintf($template, $field, $matchResult["min"], $matchResult["max"], "\r\n");
+                $template   = '"%s%s"  => "integer|between:%d,%d",%s';
+                $ruleString .= sprintf($template, $batchTemplate, $field, $matchResult["min"], $matchResult["max"], "\r\n");
 
                 // Message
-                $messageString .= "\"{$field}.integer\" => \"字段 {$field} 格式错误\",\r\n";
-                $messageString .= "\"{$field}.between\" => \"字段 {$field} 超出范围\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.integer\" => \"字段 {$field} 格式错误\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.between\" => \"字段 {$field} 超出范围\",\r\n";
 
                 continue;
             }
@@ -430,11 +442,11 @@ class NewTableParser
                 //
                 $field = Str::camel($matcher->getField());
                 // Rule
-                $template   = '"%s"  => "numeric",%s';
-                $ruleString .= sprintf($template, $field, "\r\n");
+                $template   = '"%s%s"  => "numeric",%s';
+                $ruleString .= sprintf($template, $batchTemplate, $field, "\r\n");
 
                 // Message
-                $messageString .= "\"{$field}.numeric\" => \"字段 {$field} 格式错误\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.numeric\" => \"字段 {$field} 格式错误\",\r\n";
 
                 continue;
             }
@@ -444,11 +456,11 @@ class NewTableParser
                 //
                 $field = Str::camel($matcher->getField());
                 // Rule
-                $template   = '"%s" => "string|nullable|between:%d,%d",%s';
-                $ruleString .= sprintf($template, $field, $matchResult["min"], $matchResult["max"], "\r\n");
+                $template   = '"%s%s" => "string|nullable|between:%d,%d",%s';
+                $ruleString .= sprintf($template, $batchTemplate, $field, $matchResult["min"], $matchResult["max"], "\r\n");
                 // Message
-                $messageString .= "\"{$field}.string\" => \"字段 {$field} 格式错误\",\r\n";
-                $messageString .= "\"{$field}.between\" => \"字段 {$field} 超出范围\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.string\" => \"字段 {$field} 格式错误\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.between\" => \"字段 {$field} 超出范围\",\r\n";
 
                 continue;
             }
@@ -458,10 +470,10 @@ class NewTableParser
                 //
                 $field = Str::camel($matcher->getField());
                 // Rule
-                $template   = '"%s" => "date|nullable",%s';
-                $ruleString .= sprintf($template, $field, "\r\n");
+                $template   = '"%s%s" => "date|nullable",%s';
+                $ruleString .= sprintf($template, $batchTemplate, $field, "\r\n");
                 // Message
-                $messageString .= "\"{$field}.date\" => \"字段 {$field} 日期格式错误\",\r\n";
+                $messageString .= "\"{$batchTemplate}{$field}.date\" => \"字段 {$field} 日期格式错误\",\r\n";
 
                 continue;
             }
@@ -469,10 +481,10 @@ class NewTableParser
             // 匹配不到类型
             $field = Str::camel($matcher->getField());
             // Rule
-            $template   = '"%s" => "string|nullable",%s';
-            $ruleString .= sprintf($template, $field, "\r\n");
+            $template   = '"%s%s" => "string|nullable",%s';
+            $ruleString .= sprintf($template, $batchTemplate, $field, "\r\n");
             // Message
-            $messageString .= "\"{$field}.string\" => \"字段 {$field} 格式错误\",\r\n";
+            $messageString .= "\"{$batchTemplate}{$field}.string\" => \"字段 {$field} 格式错误\",\r\n";
         }
 
         $ruleString = "return[\r\n{$ruleString}\r\n];";

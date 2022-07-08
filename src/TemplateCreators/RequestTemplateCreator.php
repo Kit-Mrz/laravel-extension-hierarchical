@@ -2,6 +2,8 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical\TemplateCreators;
 
+use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\BatchStoreRequest;
+use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\BatchUpdateRequest;
 use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\IndexRequest;
 use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\ManyRequest;
 use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\StoreRequest;
@@ -59,6 +61,16 @@ class RequestTemplateCreator implements TemplateCreatorContract
         return new UpdateRequest($this->controlName, $this->tableName, $this->tablePrefix);
     }
 
+    protected function createBatchStoreRequest() : TemplateContract
+    {
+        return new BatchStoreRequest($this->controlName, $this->tableName, $this->tablePrefix);
+    }
+
+    protected function createBatchUpdateRequest() : TemplateContract
+    {
+        return new BatchUpdateRequest($this->controlName, $this->tableName, $this->tablePrefix);
+    }
+
     public function handle() : array
     {
         $result = [];
@@ -79,6 +91,16 @@ class RequestTemplateCreator implements TemplateCreatorContract
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
         $templateHandler = $this->templateHandler->setTemplateContract($this->createUpdateRequest());
+        $result[]        = [
+            'result'       => $templateHandler->execute(),
+            'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
+        ];
+        $templateHandler = $this->templateHandler->setTemplateContract($this->createBatchStoreRequest());
+        $result[]        = [
+            'result'       => $templateHandler->execute(),
+            'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
+        ];
+        $templateHandler = $this->templateHandler->setTemplateContract($this->createBatchUpdateRequest());
         $result[]        = [
             'result'       => $templateHandler->execute(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),

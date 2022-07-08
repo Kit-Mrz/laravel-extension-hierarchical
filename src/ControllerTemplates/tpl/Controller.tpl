@@ -5,6 +5,8 @@ namespace App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls;
 use App\Components\Back\Back;
 use App\Components\ToolHelper\ToolHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls\Requests\{{RNT}}BatchStoreRequest;
+use App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls\Requests\{{RNT}}BatchUpdateRequest;
 use App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls\Requests\{{RNT}}IndexRequest;
 use App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls\Requests\{{RNT}}ManyRequest;
 use App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls\Requests\{{RNT}}StoreRequest;
@@ -121,7 +123,80 @@ class {{RNT}}Controller extends Controller
     {
         $params = $request->validated();
 
+        if (count($params['ids']) > 100) {
+            return Back::do()->failure([], '超出批量操作最大行数限制:100');
+        }
+
         $result = $this->{{RNT}}Service->many($params["ids"]);
+
+        return Back::do()->success($result);
+    }
+
+    /**
+     * @desc 批量删除
+     * @uri get /path?desc=1
+     *
+     * @return JsonResponse
+     */
+    public function batchDestroy({{RNT}}ManyRequest $request) : JsonResponse
+    {
+        $params = $request->validated();
+
+        if (count($params['ids']) > 100) {
+            return Back::do()->failure([], '超出批量操作最大行数限制:100');
+        }
+
+        $deleted = $this->{{RNT}}Service->batchDestroy($params["ids"]);
+
+        $result = [
+            'deleted' => $deleted
+        ];
+
+        return Back::do()->success($result);
+    }
+
+    /**
+     * @desc 批量保存
+     * @uri get /path?desc=1
+     *
+     * @return JsonResponse
+     */
+    public function batchStore({{RNT}}BatchStoreRequest $request) : JsonResponse
+    {
+        $params = $request->validated();
+
+        if (count($params['batch']) > 100) {
+            return Back::do()->failure([], '超出批量操作最大行数限制:100');
+        }
+
+        $created = $this->{{RNT}}Service->batchStore($params["batch"] ?? []);
+
+        $result = [
+            'created' => $created
+        ];
+
+        return Back::do()->success($result);
+    }
+
+    /**
+     * @desc 批量更新
+     * @uri get /path?desc=1
+     *
+     * @return JsonResponse
+     */
+    public function batchUpdate({{RNT}}BatchUpdateRequest $request) : JsonResponse
+    {
+        $params = $request->validated();
+
+        if (count($params['batch']) > 100) {
+            return Back::do()->failure([], '超出批量操作最大行数限制:100');
+        }
+
+        $created = $this->{{RNT}}Service->batchUpdate($params["batch"] ?? []);
+
+        $result = [
+            'created' => $created
+        ];
 
         return Back::do()->success($result);
     }

@@ -6,6 +6,7 @@ use App\Cache\CacheManagerFactory;
 use App\Components\Back\Back;
 use App\Exceptions\Business\EmptyException;
 use App\Exceptions\Business\NotExistsException;
+use App\Exceptions\Fails\CreateException;
 use App\Exceptions\Fails\DeleteException;
 use App\Exceptions\Fails\UpdateException;
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY_NAME}};
@@ -202,5 +203,87 @@ class {{RNT}}Service implements ControlServiceContract
         }
 
         return $list;
+    }
+
+     /**
+     * @desc 批量删除
+     * @param int $id
+     * @return int
+     */
+    public function batchDestroy(array $ids) : int
+    {
+        $ids = collect($ids)->filter(function ($item){
+            return $item > 0;
+        });
+
+        if ($ids->isEmpty()) {
+            return 0;
+        }
+
+        $ids = $ids->toArray();
+
+        $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}();
+
+        return $repository->batchDestroy($ids);
+    }
+
+    /**
+     * @desc 批量保存
+     * @param array $params 数据
+     * @return bool
+     */
+    public function batchStore(array $params) : bool
+    {
+        $data = [];
+
+        foreach ($params as $row) {
+            $data[] = [
+                {{CODE_TPL_STORE}}
+            ];
+        }
+
+        if (empty($data)) {
+            throw new EmptyException();
+        }
+
+        $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}();
+
+        $created = $repository->fastBatchCreate($data);
+
+        if ( !$created) {
+            throw new CreateException();
+        }
+
+        return $created;
+    }
+
+    /**
+     * @desc 批量更新
+     * @param array $params 数据
+     * @return int
+     */
+    public function batchUpdate(array $inputParams) : int
+    {
+        $datas = [];
+
+        foreach ($inputParams as $params) {
+            $data = [];
+
+            {{CODE_TPL_UPDATE}}
+
+            if ( !empty($data)) {
+                $datas[] = $data;
+            }
+        }
+
+        if (empty($datas)) {
+            throw new EmptyException();
+        }
+
+       $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}();
+
+        $objects = $repository->safeBatchUpdate($datas);
+
+        return count($objects);
     }
 }
