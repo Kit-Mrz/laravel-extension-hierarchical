@@ -5,7 +5,6 @@ namespace App\Services\{{NAMESPACE_PATH}}\{{RNT}};
 use App\Cache\CacheManagerFactory;
 use App\Components\Back\Back;
 use App\Exceptions\Business\EmptyException;
-use App\Exceptions\Business\InvalidArgumentException;
 use App\Exceptions\Business\NotExistsException;
 use App\Exceptions\Fails\DeleteException;
 use App\Exceptions\Fails\UpdateException;
@@ -180,9 +179,15 @@ class {{RNT}}Service implements ControlServiceContract
      */
     public function many(array $ids) : array
     {
-        if (1 > count($ids)) {
-            throw new InvalidArgumentException();
+        $ids = collect($ids)->filter(function ($item){
+            return $item > 0;
+        });
+
+        if ($ids->isEmpty()) {
+            return [];
         }
+
+        $ids = $ids->toArray();
 
         $fields = {{REPOSITORY_NAME}}::getSnake();
 

@@ -15,14 +15,25 @@ class ModelRepository extends TemplateAbstract implements TemplateCreatorContrac
     private $tableName;
 
     /**
+     * @var string 数据表前缀
+     */
+    private $tablePrefix;
+
+    /**
+     * @var bool
+     */
+    private $shard;
+
+    /**
      * @var NewTableParser 数据表解析器
      */
     private $tableParser;
 
-    public function __construct(string $tableName, string $tablePrefix = '')
+    public function __construct(string $tableName, string $tablePrefix = '', bool $shard = false)
     {
         $this->tableName   = $tableName;
         $this->tablePrefix = $tablePrefix;
+        $this->shard       = $shard;
         $this->tableParser = new NewTableParser(new TableInformation($tableName, $tablePrefix));
     }
 
@@ -48,6 +59,14 @@ class ModelRepository extends TemplateAbstract implements TemplateCreatorContrac
     public function getTablePrefix() : string
     {
         return $this->tablePrefix;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShard() : bool
+    {
+        return $this->shard;
     }
 
     /**

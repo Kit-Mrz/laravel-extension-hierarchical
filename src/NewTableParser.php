@@ -47,12 +47,6 @@ class NewTableParser
     {
         $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
 
-        $template = "
-            if (isset(\$params[\"%s\"])) {
-                \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %d);
-            }
-        ";
-
         $codeString = "";
         foreach ($tableFullColumns as $column) {
             if (in_array($column->Field, $ignoreFields)) {
@@ -65,7 +59,6 @@ class NewTableParser
             //****
             $matcher = new DataTypeMatcher($column->Field, $column->Type, $column->Comment);
             if ( !empty($matcher->matchInt())) {
-                $template = '"%s" => %s ($row["%s"] ?? %d),%s';
                 $template = "
                     if (isset(\$params[\"%s\"])) {
                         \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %d);
@@ -74,7 +67,6 @@ class NewTableParser
                 $type     = "(int)";
                 $val      = 0;
             } else if ( !empty($matcher->matchFloat())) {
-                $template = '"%s" => %s ($row["%s"] ?? %2f),%s';
                 $template = "
                     if (isset(\$params[\"%s\"])) {
                         \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %2f);
@@ -247,9 +239,9 @@ class NewTableParser
     /**
      * @desc Request.Store 模板
      * @param array $ignoreFields
-     * @return RequestTemplateRender
+     * @return RequestTemplateRenderContract
      */
-    public function getStoreTemplateRender(array $ignoreFields = []) : RequestTemplateRender
+    public function getStoreTemplateRender(array $ignoreFields = []) : RequestTemplateRenderContract
     {
         $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
 
@@ -343,35 +335,17 @@ class NewTableParser
 
         $messageString = "return[\r\n{$messageString}\r\n];";
 
-        return new class($ruleString, $messageString) implements RequestTemplateRender{
+        $requestTemplateRender = new RequestTemplateRender($ruleString, $messageString);
 
-            private $ruleString;
-            private $messageString;
-
-            public function __construct(string $ruleString, string $messageString)
-            {
-                $this->ruleString    = $ruleString;
-                $this->messageString = $messageString;
-            }
-
-            public function getRuleString() : string
-            {
-                return $this->ruleString;
-            }
-
-            public function getMessageString() : string
-            {
-                return $this->messageString;
-            }
-        };
+        return $requestTemplateRender;
     }
 
     /**
      * @desc Request.Update 模板
      * @param array $ignoreFields
-     * @return RequestTemplateRender
+     * @return RequestTemplateRenderContract
      */
-    public function getUpdateTemplateRender(array $ignoreFields = []) : RequestTemplateRender
+    public function getUpdateTemplateRender(array $ignoreFields = []) : RequestTemplateRenderContract
     {
         $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
 
@@ -461,26 +435,8 @@ class NewTableParser
 
         $messageString = "return[\r\n{$messageString}\r\n];";
 
-        return new class($ruleString, $messageString) implements RequestTemplateRender{
+        $requestTemplateRender = new RequestTemplateRender($ruleString, $messageString);
 
-            private $ruleString;
-            private $messageString;
-
-            public function __construct(string $ruleString, string $messageString)
-            {
-                $this->ruleString    = $ruleString;
-                $this->messageString = $messageString;
-            }
-
-            public function getRuleString() : string
-            {
-                return $this->ruleString;
-            }
-
-            public function getMessageString() : string
-            {
-                return $this->messageString;
-            }
-        };
+        return $requestTemplateRender;
     }
 }

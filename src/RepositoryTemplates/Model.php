@@ -15,14 +15,25 @@ class Model extends TemplateAbstract implements TemplateCreatorContract
     private $tableName;
 
     /**
+     * @var string 数据表前缀
+     */
+    private $tablePrefix;
+
+    /**
+     * @var bool
+     */
+    private $shard;
+
+    /**
      * @var NewTableParser 数据表解析器
      */
     private $tableParser;
 
-    public function __construct(string $tableName, string $tablePrefix = '')
+    public function __construct(string $tableName, string $tablePrefix = '', bool $shard = false)
     {
         $this->tableName   = $tableName;
         $this->tablePrefix = $tablePrefix;
+        $this->shard       = $shard;
         $this->tableParser = new NewTableParser(new TableInformation($tableName, $tablePrefix));
     }
 
@@ -50,6 +61,14 @@ class Model extends TemplateAbstract implements TemplateCreatorContract
         return $this->tablePrefix;
     }
 
+    /**
+     * @return bool
+     */
+    public function isShard() : bool
+    {
+        return $this->shard;
+    }
+
     public function handle() : array
     {
         $parser = $this->getTableParser();
@@ -72,7 +91,11 @@ class Model extends TemplateAbstract implements TemplateCreatorContract
         $saveFilename = $saveDirectory . '/' . $tableName . '.php';
 
         // 模板文件
-        $sourceTemplateFile = __DIR__ . '/tpl/Model.tpl';
+        if ($this->isShard()) {
+            $sourceTemplateFile = __DIR__ . '/stpl/Model.tpl';
+        } else {
+            $sourceTemplateFile = __DIR__ . '/tpl/Model.tpl';
+        }
 
         // 替换规则
         $replacementRules = [

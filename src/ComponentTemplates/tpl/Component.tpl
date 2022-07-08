@@ -13,7 +13,7 @@ class {{RNT}} extends ComponentAbstract
     public function getInterface() : string
     {
         // 返回接口
-        return '?';
+        return {{RNT}}Interface::class;;
     }
 
     /**
@@ -23,7 +23,7 @@ class {{RNT}} extends ComponentAbstract
     public function getImplement() : string
     {
         // 返回实现
-        return '?';
+        return {{RNT}}Impl::class;;;
     }
 
     /**

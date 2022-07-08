@@ -2,23 +2,21 @@
 
 namespace App\Services\{{NAMESPACE_PATH}}\{{RNT}};
 
+use App\Cache\CacheManagerFactory;
 use App\Components\Back\Back;
 use App\Exceptions\Business\EmptyException;
-use App\Exceptions\Business\InvalidArgumentException;
 use App\Exceptions\Business\NotExistsException;
 use App\Exceptions\Fails\DeleteException;
 use App\Exceptions\Fails\UpdateException;
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY_NAME}};
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY}};
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY}}Factory;
-use App\Supports\Spreadsheet\TransObjects\TenantTrans;
 use App\Supports\Cores\TenantShareTrait;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Mrzkit\LaravelExtensionEloquent\Contracts\ControlServiceContract;
-use Mrzkit\LaravelExtensionEloquent\FactorTrait;
 
 class {{RNT}}Service implements ControlServiceContract
 {
@@ -32,15 +30,14 @@ class {{RNT}}Service implements ControlServiceContract
     public function index(array $params)
     {
         $inputParams = [
-            "tenantId"  => (int) ($params["tenantId"] ?? -1),
             "page"      => (int) ($params["page"] ?? 1),
             "perPage"   => (int) ($params["perPage"] ?? 20),
             "orderType" => (string) ($params['orderType'] ?? "-id"),
         ];
 
-        $cacheKey = "{{RNT}}Service:index";
+        $cacheKey = CacheManagerFactory::getManager()->rta($this->getTenantId(), __METHOD__, $inputParams);
 
-        $list = Cache::remember($cacheKey, 1, function () use($inputParams) {
+        $list = Cache::remember($cacheKey, 2, function () use($inputParams) {
             //
             $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}()->setFactor($this->getFactorId());
 
@@ -58,17 +55,15 @@ class {{RNT}}Service implements ControlServiceContract
             $paginator = $repository->retrieve($fields, $relations, $paginateParams, $orderConfig, function (Builder $query) use($inputParams){
                 //
                 if (isset($inputParams['tenantId'])) {
-                    $query->where('tenant_id', $inputParams['tenantId']);
+                    //$query->where('tenant_id', $inputParams['tenantId']);
                 }
             });
 
-            $list = Back::do()->retrieveIterator($paginator, function ({{REPOSITORY_NAME}} $object){
-                //
-                $row = $object->toArray();
-                //
-                $item = {{REPOSITORY}}::handleOutput($row);
+            $renderService = {{RNT}}ServiceFactory::get{{RNT}}RenderService();
 
-                return $item;
+            $list = Back::do()->retrieveIterator($paginator, function ({{REPOSITORY_NAME}} $object) use ($renderService){
+                //
+               return $render->handle($object);
             });
 
             return $list;
@@ -100,17 +95,15 @@ class {{RNT}}Service implements ControlServiceContract
      * @param int $id 主键
      * @return array
      */
-    public function show(int $id)
+    public function show(int $id) : array
     {
         $fields = {{REPOSITORY_NAME}}::getSnake();
 
         $object = $this->info($id, $fields);
 
-        $row = $object->toArray();
+        $renderService = {{RNT}}ServiceFactory::get{{RNT}}RenderService();
 
-        $item = {{REPOSITORY}}::handleOutput($row);
-
-        return $item;
+        return $renderService->handle($object);
     }
 
     /**
@@ -186,9 +179,15 @@ class {{RNT}}Service implements ControlServiceContract
      */
     public function many(array $ids) : array
     {
-        if (1 > count($ids)) {
-            throw new InvalidArgumentException();
+        $ids = collect($ids)->filter(function ($item){
+            return $item > 0;
+        });
+
+        if ($ids->isEmpty()) {
+            return [];
         }
+
+        $ids = $ids->toArray();
 
         $fields = {{REPOSITORY_NAME}}::getSnake();
 
@@ -198,9 +197,10 @@ class {{RNT}}Service implements ControlServiceContract
 
         $list = [];
 
-        foreach ($objects->getIterator() as $row) {
-            $row    = $row->toArray();
-            $list[] = {{REPOSITORY}}::handleOutput($row);
+        $renderService = {{RNT}}ServiceFactory::get{{RNT}}RenderService();
+
+        foreach ($objects->getIterator() as $object) {
+            $list[] = $renderService->handle($object);
         }
 
         return $list;

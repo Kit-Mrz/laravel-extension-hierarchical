@@ -22,34 +22,41 @@ class RepositoryTemplateCreator implements TemplateCreatorContract
     private $tablePrefix;
 
     /**
+     * @var bool
+     */
+    private $shard;
+
+    /**
      * @var TemplateHandler
      */
     private $templateHandler;
 
-    public function __construct(string $tableName, string $tablePrefix = '')
+    public function __construct(string $tableName, string $tablePrefix = '', bool $shard = false)
     {
         $this->tableName       = $tableName;
         $this->tablePrefix     = $tablePrefix;
+        $this->shard           = $shard;
         $this->templateHandler = new TemplateHandler();
     }
+
     protected function createModel() : TemplateContract
     {
-        return new Model($this->tableName, $this->tablePrefix);
+        return new Model($this->tableName, $this->tablePrefix, $this->shard);
     }
 
     protected function createModelRepository() : TemplateContract
     {
-        return new ModelRepository($this->tableName, $this->tablePrefix);
+        return new ModelRepository($this->tableName, $this->tablePrefix, $this->shard);
     }
 
     protected function createModelRepositoryComplex() : TemplateContract
     {
-        return new ModelRepositoryComplex($this->tableName, $this->tablePrefix);
+        return new ModelRepositoryComplex($this->tableName, $this->tablePrefix, $this->shard);
     }
 
     protected function createModelRepositoryFactory() : TemplateContract
     {
-        return new ModelRepositoryFactory($this->tableName, $this->tablePrefix);
+        return new ModelRepositoryFactory($this->tableName, $this->tablePrefix, $this->shard);
     }
 
     public function handle() : array

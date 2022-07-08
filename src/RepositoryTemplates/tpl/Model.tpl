@@ -46,6 +46,17 @@ final class {{RNT}} extends CrudModel
     ];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+        'updated_at' => 'datetime:Y-m-d',
+        'deleted_at' => 'datetime:Y-m-d',
+    ];
+
+    /**
      * 可以批量赋值的属性
      *
      * @var array

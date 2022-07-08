@@ -3,11 +3,32 @@
 namespace Mrzkit\LaravelExtensionHierarchical\ComponentTemplates;
 
 use Mrzkit\LaravelExtensionHierarchical\TemplateAbstract;
+use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\TemplateCreatorContract;
 
-class ComponentAbstract extends TemplateAbstract
+class ComponentAbstract extends TemplateAbstract implements TemplateCreatorContract
 {
-    public function __construct(string $name)
+    /**
+     * @var string
+     */
+    private $name;
+
+    public function __construct(string $name = 'ComponentAbstract')
     {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() : string
+    {
+        return $this->name;
+    }
+
+    public function handle() : array
+    {
+        $name = $this->getName();
+
         // 是否强制覆盖: true=覆盖,false=不覆盖
         $forceCover = false;
 
@@ -22,7 +43,7 @@ class ComponentAbstract extends TemplateAbstract
 
         // 替换规则
         $replacementRules = [
-
+            '/{{RNT}}/' => $name,
         ];
 
         // 替换规则-回调
@@ -36,5 +57,7 @@ class ComponentAbstract extends TemplateAbstract
             ->setSourceTemplateFile($sourceTemplateFile)
             ->setReplacementRules($replacementRules)
             ->setReplacementRuleCallbacks($replacementRuleCallbacks);
+
+        return [];
     }
 }

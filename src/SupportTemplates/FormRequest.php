@@ -3,11 +3,32 @@
 namespace Mrzkit\LaravelExtensionHierarchical\SupportTemplates;
 
 use Mrzkit\LaravelExtensionHierarchical\TemplateAbstract;
+use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\TemplateCreatorContract;
 
-class FormRequest extends TemplateAbstract
+class FormRequest extends TemplateAbstract implements TemplateCreatorContract
 {
+    /**
+     * @var string
+     */
+    private $name;
+
     public function __construct(string $name)
     {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() : string
+    {
+        return $this->name;
+    }
+
+    public function handle() : array
+    {
+        $name = $this->getName();
+
         // 是否强制覆盖: true=覆盖,false=不覆盖
         $forceCover = false;
 

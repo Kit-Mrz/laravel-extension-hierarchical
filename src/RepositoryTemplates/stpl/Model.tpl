@@ -35,25 +35,6 @@ final class {{RNT}} extends ShardModel
     protected $attributes = [];
 
     /**
-     * 可以批量赋值的属性
-     *
-     * @var array
-     */
-    protected $fillable = [
-        {{FILLABLE}}
-    ];
-
-
-    /**
-     * 字段注释
-     *
-     * @var array
-     */
-    protected $attributeComments = [
-        {{ATTRIBUTE_COMMENT}}
-    ];
-
-    /**
      * 映射 Eloquent 事件
      *
      * @var array
@@ -62,6 +43,35 @@ final class {{RNT}} extends ShardModel
         'creating' => Creating::class,
         'updating' => Saving::class,
         'deleting' => Deleting::class,
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+        'updated_at' => 'datetime:Y-m-d',
+        'deleted_at' => 'datetime:Y-m-d',
+    ];
+
+    /**
+     * 可以批量赋值的属性
+     *
+     * @var array
+     */
+    protected $fillable = [
+        {{FILLABLE}}
+    ];
+
+   /**
+    * 字段注释
+    *
+    * @var array
+    */
+    protected static $fields = [
+        {{FIELDS}}
     ];
 
     /**
@@ -120,17 +130,5 @@ final class {{RNT}} extends ShardModel
     public function getShardCount() : int
     {
         return count($this->getShardConfig());
-    }
-
-    /**
-     * 表字段
-     *
-     * @var array
-     */
-    public static function getSnake() : array
-    {
-        return [
-            {{FILLABLE}}
-        ];
     }
 }

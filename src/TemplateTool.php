@@ -2,8 +2,6 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical;
 
-use Illuminate\Support\Str;
-
 trait TemplateTool
 {
     public function validateControlName(string $controlName) : bool
@@ -15,18 +13,5 @@ trait TemplateTool
         }
 
         return false;
-    }
-
-    public function convertRenderTableName(string $tableName) : string
-    {
-        if ( !Str::contains('_', $tableName)) {
-            $tableName = Str::snake($tableName);
-        }
-
-        $tableName = Str::camel($tableName);
-
-        $tableName = ucfirst($tableName);
-
-        return $tableName;
     }
 }

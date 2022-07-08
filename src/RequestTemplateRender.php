@@ -2,9 +2,31 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical;
 
-interface RequestTemplateRender
+class RequestTemplateRender implements RequestTemplateRenderContract
 {
-    public function getRuleString() : string;
+    /**
+     * @var string
+     */
+    private $ruleString;
 
-    public function getMessageString() : string;
+    /**
+     * @var string
+     */
+    private $messageString;
+
+    public function __construct(string $ruleString, string $messageString)
+    {
+        $this->ruleString    = $ruleString;
+        $this->messageString = $messageString;
+    }
+
+    public function getRuleString() : string
+    {
+        return $this->ruleString;
+    }
+
+    public function getMessageString() : string
+    {
+        return $this->messageString;
+    }
 }

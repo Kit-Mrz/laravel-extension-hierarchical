@@ -23,11 +23,16 @@ class Service extends TemplateAbstract implements TemplateCreatorContract
     private $tableName;
 
     /**
+     * @var bool
+     */
+    private $shard;
+
+    /**
      * @var NewTableParser 数据表解析器
      */
     private $tableParser;
 
-    public function __construct(string $controlName, string $tableName, string $tablePrefix = '')
+    public function __construct(string $controlName, string $tableName, string $tablePrefix = '', bool $shard = false)
     {
         if ( !$this->validateControlName($controlName)) {
             throw new \Exception("格式有误，参考格式: A.B 或 A.B.C ");
@@ -36,6 +41,7 @@ class Service extends TemplateAbstract implements TemplateCreatorContract
         $this->controlName = $controlName;
         $this->tableName   = $tableName;
         $this->tablePrefix = $tablePrefix;
+        $this->shard       = $shard;
         $this->tableParser = new NewTableParser(new TableInformation($tableName, $tablePrefix));
     }
 
@@ -69,6 +75,14 @@ class Service extends TemplateAbstract implements TemplateCreatorContract
     public function getTablePrefix() : string
     {
         return $this->tablePrefix;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShard() : bool
+    {
+        return $this->shard;
     }
 
     /**
@@ -127,7 +141,11 @@ class Service extends TemplateAbstract implements TemplateCreatorContract
         $saveFilename = $saveDirectory . '/' . $controlName . 'Service.php';
 
         // 模板文件
-        $sourceTemplateFile = __DIR__ . '/tpl/Service.tpl';
+        if ($this->isShard()) {
+            $sourceTemplateFile = __DIR__ . '/stpl/Service.tpl';
+        } else {
+            $sourceTemplateFile = __DIR__ . '/tpl/Service.tpl';
+        }
 
         // 替换规则
         $replacementRules = [

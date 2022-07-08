@@ -4,24 +4,20 @@ namespace Mrzkit\LaravelExtensionHierarchical;
 
 class DataTypeMatcher
 {
-    /** @var String */
+    /**
+     * @var string
+     */
     private $field;
-    /** @var String */
-    private $type;
-    /** @var String */
-    private $comment;
 
     /**
-     * +"Field": "id"
-     * +"Type": "int(10) unsigned"
-     * +"Null": "NO"
-     * +"Default": null
-     * +"Comment": "主键"
-     * +"Collation": null
-     * +"Key": "PRI"
-     * +"Extra": "auto_increment"
-     * +"Privileges": "select,insert,update,references"
+     * @var string
      */
+    private $type;
+
+    /**
+     * @var string
+     */
+    private $comment;
 
     public function __construct(string $field, string $type, string $comment)
     {
@@ -301,10 +297,5 @@ class DataTypeMatcher
         }
 
         return $result;
-    }
-
-    public function matchOther() : array
-    {
-        return [];
     }
 }

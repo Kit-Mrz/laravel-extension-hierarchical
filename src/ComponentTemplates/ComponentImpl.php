@@ -3,11 +3,33 @@
 namespace Mrzkit\LaravelExtensionHierarchical\ComponentTemplates;
 
 use Mrzkit\LaravelExtensionHierarchical\TemplateAbstract;
+use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\TemplateCreatorContract;
 
-class ComponentImpl extends TemplateAbstract
+class ComponentImpl extends TemplateAbstract implements TemplateCreatorContract
 {
+
+    /**
+     * @var string
+     */
+    private $name;
+
     public function __construct(string $name)
     {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() : string
+    {
+        return $this->name;
+    }
+
+    public function handle() : array
+    {
+        $name = $this->getName();
+
         // 是否强制覆盖: true=覆盖,false=不覆盖
         $forceCover = false;
 
@@ -27,7 +49,6 @@ class ComponentImpl extends TemplateAbstract
 
         // 替换规则-回调
         $replacementRuleCallbacks = [
-
         ];
 
         $this->setForceCover($forceCover)
@@ -36,5 +57,7 @@ class ComponentImpl extends TemplateAbstract
             ->setSourceTemplateFile($sourceTemplateFile)
             ->setReplacementRules($replacementRules)
             ->setReplacementRuleCallbacks($replacementRuleCallbacks);
+
+        return [];
     }
 }
