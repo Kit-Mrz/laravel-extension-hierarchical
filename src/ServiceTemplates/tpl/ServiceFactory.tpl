@@ -28,12 +28,12 @@ class {{RNT}}ServiceFactory
 
     /**
      * @desc 渲染服务
-     * @return {{RNT}}BusinessService
+     * @return {{RNT}}RenderService
      */
-    public static function get{{RNT}}ServiceRender() : {{RNT}}ServiceRender
+    public static function get{{RNT}}RenderService() : {{RNT}}RenderService
     {
-        app()->singletonIf({{RNT}}ServiceRender::class);
+        app()->singletonIf({{RNT}}RenderService::class);
 
-        return app({{RNT}}ServiceRender::class);
+        return app({{RNT}}RenderService::class);
     }
 }

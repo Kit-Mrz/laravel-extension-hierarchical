@@ -9,12 +9,10 @@ use App\Exceptions\Business\NotExistsException;
 use App\Exceptions\Fails\DeleteException;
 use App\Exceptions\Fails\UpdateException;
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY_NAME}};
-use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY}};
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY}}Factory;
 use App\Supports\Cores\TenantShareTrait;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Mrzkit\LaravelExtensionEloquent\Contracts\ControlServiceContract;
 
@@ -63,7 +61,7 @@ class {{RNT}}Service implements ControlServiceContract
 
             $list = Back::do()->retrieveIterator($paginator, function ({{REPOSITORY_NAME}} $object) use ($renderService){
                 //
-               return $render->handle($object);
+               return $renderService->handle($object);
             });
 
             return $list;

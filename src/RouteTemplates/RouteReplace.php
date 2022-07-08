@@ -69,8 +69,8 @@ class RouteReplace extends TemplateAbstract implements TemplateCreatorContract
     {
         $fullControlName = $this->getControlName();
 
-        if (strrpos($fullControlName, '.') !== false) {
-            $firstControlName = substr($fullControlName, 0, strrpos($fullControlName, '.'));
+        if (strpos($fullControlName, '.') !== false) {
+            $firstControlName = substr($fullControlName, 0, strpos($fullControlName, '.'));
         } else {
             $firstControlName = $fullControlName;
         }
@@ -101,8 +101,6 @@ class RouteReplace extends TemplateAbstract implements TemplateCreatorContract
         if ( !file_exists($routePath)) {
             throw new \InvalidArgumentException('路由文件不存在:' . $routePath);
         }
-        // 设置路由
-        $this->routePath = $routePath;
 
         // 读取路由文件
         $content = file_get_contents($routePath);
@@ -145,13 +143,5 @@ class RouteReplace extends TemplateAbstract implements TemplateCreatorContract
             ->setReplacementRuleCallbacks($replacementRuleCallbacks);
 
         return [];
-    }
-
-    /**
-     * @return string
-     */
-    public function getRoutePath() : string
-    {
-        return $this->routePath;
     }
 }

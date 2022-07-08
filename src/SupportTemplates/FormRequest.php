@@ -56,5 +56,7 @@ class FormRequest extends TemplateAbstract implements TemplateCreatorContract
             ->setSourceTemplateFile($sourceTemplateFile)
             ->setReplacementRules($replacementRules)
             ->setReplacementRuleCallbacks($replacementRuleCallbacks);
+
+        return [];
     }
 }

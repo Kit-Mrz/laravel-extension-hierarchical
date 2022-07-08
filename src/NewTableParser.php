@@ -166,13 +166,57 @@ class NewTableParser
             //****
             $matcher = new DataTypeMatcher($column->Field, $column->Type, $column->Comment);
             if ( !empty($matcher->matchInt())) {
+                $template = '"%s" => %s $row["%s"],%s';
+                $type     = "(int)";
+            } else if ( !empty($matcher->matchFloat())) {
+                $template = '"%s" => %s $row["%s"],%s';
+                $type     = "(double)";
+            } else if ( !empty($matcher->matchString())) {
+                $template = '"%s" => %s $row["%s"],%s';
+                $type     = "(string)";
+            } else if ( !empty($matcher->matchDate())) {
+                $template = '"%s" => %s $row["%s"],%s';
+                $type     = "";
+            } else {
+                $template = '"%s" => %s $row["%s"],%s';
+                $type     = "(string)";
+            }
+            //****
+
+            $field      = $column->Field;
+            $snakeField = Str::snake($field);
+            $camelField = Str::camel($field);
+
+            if ($camelFirst) {
+                $fieldString .= sprintf($template, $camelField, $type, $snakeField, "\r\n");
+            } else {
+                $fieldString .= sprintf($template, $snakeField, $type, $camelField, "\r\n");
+            }
+        }
+
+        return $fieldString;
+    }
+
+    public function getHandleOutputRenderBackup(array $ignoreFields = [], bool $camelFirst = true) : string
+    {
+        $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
+
+        $fieldString = "";
+
+        foreach ($tableFullColumns as $column) {
+            if (in_array($column->Field, $ignoreFields)) {
+                continue;
+            }
+            //****
+            $matcher = new DataTypeMatcher($column->Field, $column->Type, $column->Comment);
+            if ( !empty($matcher->matchInt())) {
                 $template = '"%s" => %s ($row["%s"] ?? %d),%s';
                 $type     = "(int)";
                 $val      = 0;
             } else if ( !empty($matcher->matchFloat())) {
                 $template = '"%s" => %s ($row["%s"] ?? %2f),%s';
                 $type     = "(double)";
-                $val      = 0.00;
+                $val      = 0;
             } else if ( !empty($matcher->matchString())) {
                 $template = '"%s" => %s ($row["%s"] ?? %s),%s';
                 $type     = "(string)";

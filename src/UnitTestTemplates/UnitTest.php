@@ -1,16 +1,15 @@
 <?php
 
-namespace Mrzkit\LaravelExtensionHierarchical\RouteTemplates;
+namespace Mrzkit\LaravelExtensionHierarchical\UnitTestTemplates;
 
 use Illuminate\Support\Str;
-use InvalidArgumentException;
 use Mrzkit\LaravelExtensionHierarchical\NewTableParser;
 use Mrzkit\LaravelExtensionHierarchical\TableInformation;
 use Mrzkit\LaravelExtensionHierarchical\TemplateAbstract;
 use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\TemplateCreatorContract;
 use Mrzkit\LaravelExtensionHierarchical\TemplateTool;
 
-class Route extends TemplateAbstract implements TemplateCreatorContract
+class UnitTest extends TemplateAbstract implements TemplateCreatorContract
 {
     use TemplateTool;
 
@@ -65,15 +64,17 @@ class Route extends TemplateAbstract implements TemplateCreatorContract
         return $this->tableParser;
     }
 
+    /**
+     * @return string
+     */
+    public function getTablePrefix() : string
+    {
+        return $this->tablePrefix;
+    }
+
     public function handle() : array
     {
         $fullControlName = $this->getControlName();
-
-        if (strpos($fullControlName, '.') !== false) {
-            $firstControlName = substr($fullControlName, 0, strpos($fullControlName, '.'));
-        } else {
-            $firstControlName = $fullControlName;
-        }
 
         if (strripos($fullControlName, '.') !== false) {
             $controlName = substr($fullControlName, strripos($fullControlName, '.') + 1);
@@ -92,59 +93,57 @@ class Route extends TemplateAbstract implements TemplateCreatorContract
         $directoryPath = strlen($directoryPath) > 0 ? $directoryPath . DIRECTORY_SEPARATOR : $directoryPath;
 
         //********************************************************
-        $controlPathName = Str::snake($controlName, '-');
-
-        // ************************************
-        $firstControlNameCamel = Str::camel($firstControlName);
-
-        // 模板和写入文件都是自己
-        $routePath = app()->basePath("routes") . '/' . $firstControlNameCamel . '.php';
-
-        if ( !file_exists($routePath)) {
-            $tpl = file_get_contents(__DIR__ . '/tpl/RouteEmpty.tpl');
-
-            if (file_put_contents($routePath, $tpl) === false) {
-                throw new InvalidArgumentException('创建路由文件失败:' . $routePath);
-            }
-        }
-
-        // 读取路由文件
-        $content = file_get_contents($routePath);
-
-        // 如果有此关键字，则不添加
-        $force = true;
-        if (preg_match("/{$controlName}/", $content)) {
-            $force = false;
-        }
-
-        // 中间件
-        $authMiddleware = $controlName == 'AdminSystem' ? 'auth:adm' : 'auth:api';
-
-        //********************************************************
 
         // 是否强制覆盖: true=覆盖,false=不覆盖
-        $forceCover = $force;
+        $forceCover = false;
 
         // 保存目录
-        $saveDirectory = app()->basePath("routes");
+        $saveDirectory = app()->basePath("tests/Feature/{$directoryPath}{$controlName}Controls");
+        $saveDirectory = app()->basePath("tests/Feature/{$directoryPath}");
+
+        $saveDirectory = rtrim($saveDirectory, '/');
 
         // 保存文件名称
-        $saveFilename = '/tmp/not-need.log';
+        $saveFilename = $saveDirectory . '/' . $controlName . 'ControllerTest.php';
 
         // 模板文件
-        $sourceTemplateFile = __DIR__ . '/tpl/Route.tpl';
+        $sourceTemplateFile = __DIR__ . '/tpl/UnitTest.tpl';
 
         // 替换规则
         $replacementRules = [
-            '/{{AUTH_MIDDLEWARE}}/'  => $authMiddleware,
-            '/{{NAMESPACE_PATH}}/'   => $namespacePath,
-            '/{{RNT}}/'              => $controlName,
-            '/{{LOWER_ROUTE_NAME}}/' => $controlPathName,
+            '/{{NAMESPACE_PATH}}/' => $namespacePath,
+            '/{{RNT}}/'            => $controlName,
+            '/{{RNT_ROUTE_PATH}}/' => Str::snake($controlName, '-'),
         ];
 
         // 替换规则-回调
         $replacementRuleCallbacks = [
+            // 将 $Good 替换为 ->good
+            '/(\\$)(' . $controlName . ')/' => function ($match){
+                //$full   = $match[0];
+                $symbol   = $match[1];
+                $name     = $match[2];
+                $humpName = strtolower(substr($name, 0, 1)) . substr($name, 1);
 
+                return $symbol . $humpName;
+            },
+            // 将 ->Good 替换为 ->good
+            '/(\->)(' . $controlName . ')/' => function ($match){
+                //$full   = $match[0];
+                $symbol = $match[1];
+                $name   = $match[2];
+
+                $humpName = strtolower(substr($name, 0, 1)) . substr($name, 1);
+
+                return $symbol . $humpName;
+            },
+            '/(\->)(\\$)(\w+)/'             => function ($match){
+                $symbol   = $match[1];
+                $name     = $match[3];
+                $humpName = strtolower(substr($name, 0, 2)) . substr($name, 2);
+
+                return $symbol . $humpName;
+            },
         ];
 
         $this->setForceCover($forceCover)
@@ -156,4 +155,5 @@ class Route extends TemplateAbstract implements TemplateCreatorContract
 
         return [];
     }
+
 }
