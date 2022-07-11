@@ -80,6 +80,7 @@ class BatchUpdateRequest extends TemplateAbstract implements TemplateCreatorCont
         return [
             "id", "createdBy", "createdAt", "updatedBy", "updatedAt", "deletedBy", "deletedAt",
             "id", "created_by", "created_at", "updated_by", "updated_at", "deleted_by", "deleted_at",
+            "tenant_id", "tenantId",
         ];
     }
 

@@ -6,15 +6,14 @@ use App\Cache\CacheManagerFactory;
 use App\Components\Back\Back;
 use App\Exceptions\Business\EmptyException;
 use App\Exceptions\Business\NotExistsException;
+use App\Exceptions\Fails\CreateException;
 use App\Exceptions\Fails\DeleteException;
 use App\Exceptions\Fails\UpdateException;
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY_NAME}};
-use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY}};
 use App\Repositories\{{REPOSITORY_NAME}}\{{REPOSITORY}}Factory;
 use App\Supports\Cores\TenantShareTrait;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Mrzkit\LaravelExtensionEloquent\Contracts\ControlServiceContract;
 
@@ -33,6 +32,7 @@ class {{RNT}}Service implements ControlServiceContract
             "page"      => (int) ($params["page"] ?? 1),
             "perPage"   => (int) ($params["perPage"] ?? 20),
             "orderType" => (string) ($params['orderType'] ?? "-id"),
+            "tenantId"  => $this->getTenantId(),
         ];
 
         $cacheKey = CacheManagerFactory::getManager()->rta($this->getTenantId(), __METHOD__, $inputParams);
@@ -55,7 +55,7 @@ class {{RNT}}Service implements ControlServiceContract
             $paginator = $repository->retrieve($fields, $relations, $paginateParams, $orderConfig, function (Builder $query) use($inputParams){
                 //
                 if (isset($inputParams['tenantId'])) {
-                    //$query->where('tenant_id', $inputParams['tenantId']);
+                    $query->where('tenant_id', $inputParams['tenantId']);
                 }
             });
 
@@ -63,7 +63,7 @@ class {{RNT}}Service implements ControlServiceContract
 
             $list = Back::do()->retrieveIterator($paginator, function ({{REPOSITORY_NAME}} $object) use ($renderService){
                 //
-               return $render->handle($object);
+               return $renderService->handle($object);
             });
 
             return $list;
@@ -83,7 +83,7 @@ class {{RNT}}Service implements ControlServiceContract
             {{CODE_TPL_STORE}}
         ];
 
-        $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}()->setFactor($this->getFactorId());
+        $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}();
 
         $object = $repository->create($inputParams);
 
@@ -114,17 +114,17 @@ class {{RNT}}Service implements ControlServiceContract
      */
     public function update(int $id, array $params) : bool
     {
-        $data = [];
+        $tempParams = [];
 
         {{CODE_TPL_UPDATE}}
 
-        if (empty($data)) {
+        if (empty($tempParams)) {
             throw new EmptyException();
         }
 
         $object = $this->info($id);
 
-        $updated = $object->update($data);
+        $updated = $object->update($tempParams);
 
         if ( !$updated) {
             throw new UpdateException();
@@ -204,5 +204,99 @@ class {{RNT}}Service implements ControlServiceContract
         }
 
         return $list;
+    }
+
+     /**
+     * @desc 批量删除
+     * @param int $id
+     * @return int
+     */
+    public function batchDestroy(array $ids) : int
+    {
+        $ids = collect($ids)->filter(function ($item){
+            return $item > 0;
+        });
+
+        if ($ids->isEmpty()) {
+            return 0;
+        }
+
+        $ids = $ids->toArray();
+
+        $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}()->setFactor($this->getFactorId());
+
+        return $repository->batchDestroy($ids);
+    }
+
+    /**
+     * @desc 批量保存
+     * @param array $params 数据
+     * @return bool
+     */
+    public function batchStore(array $params) : bool
+    {
+        $inputParams = [];
+
+        foreach ($params as $param) {
+            $inputParams[] = [
+                {{CODE_TPL_STORE}}
+            ];
+        }
+
+        if (empty($inputParams)) {
+            throw new EmptyException();
+        }
+
+        $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}()->setFactor($this->getFactorId());
+
+        $created = $repository->fastBatchCreate($inputParams);
+
+        if ( !$created) {
+            throw new CreateException();
+        }
+
+        return $created;
+    }
+
+    /**
+     * @desc 批量更新
+     * @param array $params 数据
+     * @return int
+     */
+    public function batchUpdate(array $params) : int
+    {
+        $inputParams = [];
+
+        foreach ($params as $param) {
+            $tempParams = [];
+
+             if (isset($param["id"])) {
+                $tempParams["_id"] = (int) $param["id"];
+             }
+
+             if (isset($param["factor"])) {
+                $tempParams["_factor"] = (int) $param["factor"];
+             }
+
+            {{BATCH_UPDATE_CODE_TPL}}
+
+            if ( !empty($tempParams)) {
+                 if ( !isset($tempParams["_factor"])) {
+                    $tempParams["_factor"] = $this->getFactorId();
+                }
+
+                $inputParams[] = $tempParams;
+            }
+        }
+
+        if (empty($inputParams)) {
+            throw new EmptyException();
+        }
+
+       $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}()->setFactor($this->getFactorId());
+
+        $objects = $repository->safeBatchUpdate($inputParams);
+
+        return count($objects);
     }
 }

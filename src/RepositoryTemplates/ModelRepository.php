@@ -102,7 +102,11 @@ class ModelRepository extends TemplateAbstract implements TemplateCreatorContrac
         $saveFilename = $saveDirectory . '/' . $tableName . 'Repository.php';
 
         // 模板文件
-        $sourceTemplateFile = __DIR__ . '/tpl/ModelRepository.tpl';
+        if ($this->isShard()) {
+            $sourceTemplateFile = __DIR__ . '/stpl/ModelRepository.tpl';
+        } else {
+            $sourceTemplateFile = __DIR__ . '/tpl/ModelRepository.tpl';
+        }
 
         // 替换规则
         $replacementRules = [

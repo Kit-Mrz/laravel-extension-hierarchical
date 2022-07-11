@@ -101,7 +101,11 @@ class ModelRepositoryComplex extends TemplateAbstract implements TemplateCreator
         $saveFilename = $saveDirectory . '/' . $tableName . 'RepositoryComplex.php';
 
         // 模板文件
-        $sourceTemplateFile = __DIR__ . '/tpl/ModelRepositoryComplex.tpl';
+        if ($this->isShard()) {
+            $sourceTemplateFile = __DIR__ . '/stpl/ModelRepositoryComplex.tpl';
+        } else {
+            $sourceTemplateFile = __DIR__ . '/tpl/ModelRepositoryComplex.tpl';
+        }
 
         // 替换规则
         $replacementRules = [

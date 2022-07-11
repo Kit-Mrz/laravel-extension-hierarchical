@@ -29,15 +29,14 @@ class Tester
         ];
 
         $params = [
-            "shard"     => 0,
+            "shard"     => 1,
             "prefix"    => env('DB_PREFIX', ""),
-            "tableName" => "tags",
-            "controls"  => "CpcSystem.Tag",
+            "tableName" => "renewal_payments",
+            "controls"  => "CpcSystem.RenewalPayments",
         ];
 
-
         // Repository
-        $creator = new RepositoryTemplateCreator($params["tableName"], $params["prefix"]);
+        $creator = new RepositoryTemplateCreator($params["tableName"], $params["prefix"], $params["shard"]);
         dump($creator->handle());
         // Service
         $creator = new ServiceTemplateCreator($params["controls"], $params["tableName"], $params["prefix"], $params["shard"]);

@@ -8,6 +8,11 @@ use App\Http\Controllers\{{NAMESPACE_PATH}}\{{RNT}}Controls\{{RNT}}Controller;
 class {{RNT}}ControllerTest extends BaseTest
 {
     /**
+     * 路由前缀
+     */
+    const PREFIX = "";
+
+    /**
      * @desc {{RNT}}
      * @see {{RNT}}Controller::index()
      * @uri get:/{{RNT_ROUTE_PATH}}?page=1&perPage=20&orderType=-id
@@ -20,7 +25,7 @@ class {{RNT}}ControllerTest extends BaseTest
             "orderType" => "+id",
         ];
 
-        $uri = "/{{RNT_ROUTE_PATH}}" . '?' . http_build_query($query);
+        $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}" . '?' . http_build_query($query);
 
         $response = $this->get($uri, ["Authorization" => $this->getToken(),]);
 
@@ -40,7 +45,7 @@ class {{RNT}}ControllerTest extends BaseTest
             {{UNIT_TEST_STORE_CODE}}
         ];
 
-        $uri = "/{{RNT_ROUTE_PATH}}";
+        $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}";
 
         $response = $this->post($uri, $data, ["Authorization" => $this->getToken(),]);
 
@@ -58,7 +63,7 @@ class {{RNT}}ControllerTest extends BaseTest
     {
         $id = 1;
 
-        $uri = "/{{RNT_ROUTE_PATH}}/{$id}";
+        $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}/{$id}";
 
         $response = $this->get($uri, ["Authorization" => $this->getToken(),]);
 
@@ -80,7 +85,7 @@ class {{RNT}}ControllerTest extends BaseTest
             {{UNIT_TEST_STORE_CODE}}
         ];
 
-        $uri = "/{{RNT_ROUTE_PATH}}/{$id}";
+        $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}/{$id}";
 
         $response = $this->put($uri, $data, ["Authorization" => $this->getToken(),]);
 
@@ -100,7 +105,7 @@ class {{RNT}}ControllerTest extends BaseTest
 
         $data = [];
 
-        $uri = "/{{RNT_ROUTE_PATH}}/{$id}";
+        $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}/{$id}";
 
         $response = $this->delete($uri, $data, ["Authorization" => $this->getToken(),]);
 
@@ -120,7 +125,7 @@ class {{RNT}}ControllerTest extends BaseTest
             "ids" => [1, 2, 3],
         ];
 
-        $uri = "/{{RNT_ROUTE_PATH}}-ext/many";
+        $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}-ext/many";
 
         $response = $this->post($uri, $data, ["Authorization" => $this->getToken(),]);
 
@@ -140,7 +145,7 @@ class {{RNT}}ControllerTest extends BaseTest
             "ids" => [1, 2, 3],
         ];
 
-        $uri = "/{{RNT_ROUTE_PATH}}-ext/batch-destroy";
+        $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}-ext/batch-destroy";
 
         $response = $this->post($uri, $data, ["Authorization" => $this->getToken(),]);
 
@@ -165,7 +170,7 @@ class {{RNT}}ControllerTest extends BaseTest
 
         ];
 
-        $uri = "/{{RNT_ROUTE_PATH}}-ext/batch-store";
+        $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}-ext/batch-store";
 
         $response = $this->post($uri, $data, ["Authorization" => $this->getToken(),]);
 
@@ -191,7 +196,7 @@ class {{RNT}}ControllerTest extends BaseTest
 
         ];
 
-        $uri = "/{{RNT_ROUTE_PATH}}-ext/batch-update";
+        $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}-ext/batch-update";
 
         $response = $this->post($uri, $data, ["Authorization" => $this->getToken(),]);
 

@@ -123,8 +123,9 @@ class Service extends TemplateAbstract implements TemplateCreatorContract
 
         $repositoryName = $parser->getRenderTableName();
 
-        $updateCodeString = $parser->updateCodeTemplate($this->getIgnoreFields());
-        $storeCodeString  = $parser->storeCodeTemplate($this->getIgnoreFields());
+        $updateCodeString      = $parser->updateCodeTemplate($this->getIgnoreFields(), "params");
+        $batchUpdateCodeString = $parser->updateCodeTemplate($this->getIgnoreFields(), "param");
+        $storeCodeString       = $parser->storeCodeTemplate($this->getIgnoreFields(), "param");
 
         // 数据仓库名称
         $repository = "{$repositoryName}Repository";
@@ -149,12 +150,13 @@ class Service extends TemplateAbstract implements TemplateCreatorContract
 
         // 替换规则
         $replacementRules = [
-            '/{{NAMESPACE_PATH}}/'  => $namespacePath,
-            '/{{RNT}}/'             => $controlName,
-            '/{{CODE_TPL_UPDATE}}/' => $updateCodeString,
-            '/{{CODE_TPL_STORE}}/'  => $storeCodeString,
-            '/{{REPOSITORY}}/'      => $repository,
-            '/{{REPOSITORY_NAME}}/' => $repositoryName,
+            '/{{NAMESPACE_PATH}}/'        => $namespacePath,
+            '/{{RNT}}/'                   => $controlName,
+            '/{{CODE_TPL_UPDATE}}/'       => $updateCodeString,
+            '/{{BATCH_UPDATE_CODE_TPL}}/' => $batchUpdateCodeString,
+            '/{{CODE_TPL_STORE}}/'        => $storeCodeString,
+            '/{{REPOSITORY}}/'            => $repository,
+            '/{{REPOSITORY_NAME}}/'       => $repositoryName,
         ];
 
         // 替换规则-回调

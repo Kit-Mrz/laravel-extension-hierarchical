@@ -43,7 +43,7 @@ class NewTableParser
         return $tableName;
     }
 
-    public function updateCodeTemplate(array $ignoreFields = []) : string
+    public function updateCodeTemplate(array $ignoreFields = [], string $itemName = "row") : string
     {
         $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
 
@@ -60,40 +60,40 @@ class NewTableParser
             $matcher = new DataTypeMatcher($column->Field, $column->Type, $column->Comment);
             if ( !empty($matcher->matchInt())) {
                 $template = "
-                    if (isset(\$params[\"%s\"])) {
-                        \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %d);
+                    if (isset(\${$itemName}[\"%s\"])) {
+                        \$tempParams[\"%s\"] = %s (\${$itemName}[\"%s\"] ?? %d);
                     }
                 ";
                 $type     = "(int)";
                 $val      = 0;
             } else if ( !empty($matcher->matchFloat())) {
                 $template = "
-                    if (isset(\$params[\"%s\"])) {
-                        \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %2f);
+                    if (isset(\${$itemName}[\"%s\"])) {
+                        \$tempParams[\"%s\"] = %s (\${$itemName}[\"%s\"] ?? %2f);
                     }
                 ";
                 $type     = "(double)";
                 $val      = 0.00;
             } else if ( !empty($matcher->matchString())) {
                 $template = "
-                    if (isset(\$params[\"%s\"])) {
-                        \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %s);
+                    if (isset(\${$itemName}[\"%s\"])) {
+                        \$tempParams[\"%s\"] = %s (\${$itemName}[\"%s\"] ?? %s);
                     }
                 ";
                 $type     = "(string)";
                 $val      = "\"\"";
             } else if ( !empty($matcher->matchDate())) {
                 $template = "
-                    if (isset(\$params[\"%s\"])) {
-                        \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %s);
+                    if (isset(\${$itemName}[\"%s\"])) {
+                        \$tempParams[\"%s\"] = %s (\${$itemName}[\"%s\"] ?? %s);
                     }
                 ";
                 $type     = "";
                 $val      = "null";
             } else {
                 $template = "
-                    if (isset(\$params[\"%s\"])) {
-                        \$data[\"%s\"] = %s (\$params[\"%s\"] ?? %s),;
+                    if (isset(\${$itemName}[\"%s\"])) {
+                        \$tempParams[\"%s\"] = %s (\${$itemName}[\"%s\"] ?? %s),;
                     }
                 ";
                 $type     = "(string)";
@@ -111,8 +111,10 @@ class NewTableParser
      * @param array $fields
      * @return string
      */
-    public function storeCodeTemplate(array $ignoreFields = []) : string
+    public function storeCodeTemplate(array $ignoreFields = [], string $itemName = "row") : string
     {
+        $itemName = '$' . $itemName;
+
         $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
 
         $codeString = "";
@@ -126,27 +128,27 @@ class NewTableParser
             //****
             $matcher = new DataTypeMatcher($column->Field, $column->Type, $column->Comment);
             if ( !empty($matcher->matchInt())) {
-                $template = '"%s" => %s ($row["%s"] ?? %d),%s';
+                $template = '"%s" => %s (%s["%s"] ?? %d),%s';
                 $type     = "(int)";
                 $val      = 0;
             } else if ( !empty($matcher->matchFloat())) {
-                $template = '"%s" => %s ($row["%s"] ?? %2f),%s';
+                $template = '"%s" => %s (%s["%s"] ?? %2f),%s';
                 $type     = "(double)";
                 $val      = 0.00;
             } else if ( !empty($matcher->matchString())) {
-                $template = '"%s" => %s ($row["%s"] ?? %s),%s';
+                $template = '"%s" => %s (%s["%s"] ?? %s),%s';
                 $type     = "(string)";
                 $val      = "\"\"";
             } else if ( !empty($matcher->matchDate())) {
-                $template = '"%s" => %s ($row["%s"] ?? %s),%s';
+                $template = '"%s" => %s (%s["%s"] ?? %s),%s';
                 $type     = "";
                 $val      = "null";
             } else {
-                $template = '"%s" => %s ($row["%s"] ?? %s),%s';
+                $template = '"%s" => %s (%s["%s"] ?? %s),%s';
                 $type     = "(string)";
                 $val      = "";
             }
-            $codeString .= sprintf($template, $snakeField, $type, $camelField, $val, "\r\n");
+            $codeString .= sprintf($template, $snakeField, $type, $itemName, $camelField, $val, "\r\n");
             //****
         }
 
@@ -199,7 +201,6 @@ class NewTableParser
 
         return $codeString;
     }
-
 
     public function getHandleOutputRender(array $ignoreFields = [], bool $camelFirst = true) : string
     {
@@ -382,7 +383,7 @@ class NewTableParser
                 $field = Str::camel($matcher->getField());
                 // Rule
                 $template   = '"%s%s"  => "required|numeric",%s';
-                $ruleString .= sprintf($template, $batchTemplate,$field, "\r\n");
+                $ruleString .= sprintf($template, $batchTemplate, $field, "\r\n");
 
                 // Message
                 $messageString .= "\"{$batchTemplate}{$field}.required\" => \"缺少 {$field} 字段\",\r\n";
@@ -397,7 +398,7 @@ class NewTableParser
                 $field = Str::camel($matcher->getField());
                 // Rule
                 $template   = '"%s%s" => "required|string|nullable|between:%d,%d",%s';
-                $ruleString .= sprintf($template, $batchTemplate,$field, $matchResult["min"], $matchResult["max"], "\r\n");
+                $ruleString .= sprintf($template, $batchTemplate, $field, $matchResult["min"], $matchResult["max"], "\r\n");
                 // Message
                 $messageString .= "\"{$batchTemplate}{$field}.required\" => \"缺少 {$field} 字段\",\r\n";
                 $messageString .= "\"{$batchTemplate}{$field}.string\" => \"字段 {$field} 格式错误\",\r\n";
@@ -412,7 +413,7 @@ class NewTableParser
                 $field = Str::camel($matcher->getField());
                 // Rule
                 $template   = '"%s%s" => "required|date|nullable",%s';
-                $ruleString .= sprintf($template, $batchTemplate,$field, "\r\n");
+                $ruleString .= sprintf($template, $batchTemplate, $field, "\r\n");
                 // Message
                 $messageString .= "\"{$batchTemplate}{$field}.required\" => \"缺少 {$field} 字段\",\r\n";
                 $messageString .= "\"{$batchTemplate}{$field}.date\" => \"字段 {$field} 日期格式错误\",\r\n";
@@ -424,7 +425,7 @@ class NewTableParser
             $field = Str::camel($matcher->getField());
             // Rule
             $template   = '"%s%s" => "string|nullable",%s';
-            $ruleString .= sprintf($template, $batchTemplate,$field, "\r\n");
+            $ruleString .= sprintf($template, $batchTemplate, $field, "\r\n");
             // Message
             $messageString .= "\"{$batchTemplate}{$field}.string\" => \"字段 {$field} 格式错误\",\r\n";
         }
