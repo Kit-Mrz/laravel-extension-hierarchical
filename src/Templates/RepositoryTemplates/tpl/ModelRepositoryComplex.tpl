@@ -57,7 +57,7 @@ final class {{RNT}}RepositoryComplex extends CrudRepository
     public static function handleOutput(array $row) : array
     {
         $item = [
-            {{CODE_TPL_ITEM}}
+            {{HANDLE_OUTPUT_TPL}}
         ];
 
         return $item;
@@ -71,7 +71,7 @@ final class {{RNT}}RepositoryComplex extends CrudRepository
     public static function handleOutputRelations(array $row) : array
     {
         $item = [
-            {{CODE_TPL_ITEM_HUMP}}
+            {{HANDLE_OUTPUT_RELATIONS_TPL}}
         ];
 
         return $item;

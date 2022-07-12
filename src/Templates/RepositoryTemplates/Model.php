@@ -72,8 +72,8 @@ class Model implements TemplateHandleContract
         // 替换规则
         $replacementRules = [
             '/{{RNT}}/'              => $tableName,
-            '/{{FILL_ABLE_TPL}}/'    => $codeTemplate->getFieldsTpl(),
-            '/{{FIELDS_TPL}}/'       => $codeTemplate->getFillAbleTpl(),
+            '/{{FILL_ABLE_TPL}}/'    => $codeTemplate->getFillAbleTpl(),
+            '/{{FIELDS_TPL}}/'       => $codeTemplate->getFieldsTpl(),
             '/{{MAX_SHARD_COUNT}}/'  => $tableInformationContract->getMaxShardCount(),
             '/{{SHARD_CONFIG_TPL}}/' => $codeTemplate->getShardConfigTpl(),
         ];

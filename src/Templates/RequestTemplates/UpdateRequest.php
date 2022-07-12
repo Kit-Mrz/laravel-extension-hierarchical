@@ -79,7 +79,7 @@ class UpdateRequest implements TemplateHandleContract
 
         $directoryPath = static::processDirectoryPath($fullControlName);
 
-        $requestTemplateRenderContract = $this->getCodeTemplate()->getRequestUpdateTpl();
+        $requestTemplateRenderContract = $this->getCodeTemplate()->getRequestUpdateTpl($this->getIgnoreFields());
 
         //********************************************************
 

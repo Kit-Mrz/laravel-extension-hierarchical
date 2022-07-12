@@ -79,7 +79,7 @@ class StoreRequest implements TemplateHandleContract
 
         $directoryPath = static::processDirectoryPath($fullControlName);
 
-        $requestTemplateRenderContract = $this->getCodeTemplate()->getRequestStoreTpl();
+        $requestTemplateRenderContract = $this->getCodeTemplate()->getRequestStoreTpl($this->getIgnoreFields());
 
         //********************************************************
 

@@ -15,7 +15,7 @@ class Tester
 
     public static function testRunner()
     {
-        $params = [
+        $params1 = [
             "tableShard"    => 1,
             "shardCount"    => 2,
             "maxShardCount" => 64,
@@ -24,35 +24,28 @@ class Tester
             "controls"      => "CpcSystem.RenewalPayments",
         ];
 
-        $params = [
-            "tableShard" => 0,
-            "prefix"     => env('DB_PREFIX', ""),
-            "tableName"  => "tags",
-            "controls"   => "CpcSystem.Tag",
+        $params2 = [
+            "tableShard"    => 0,
+            "shardCount"    => 0,
+            "maxShardCount" => 0,
+            "tablePrefix"   => env('DB_PREFIX', ""),
+            "tableName"     => "tags",
+            "controls"      => "CpcSystem.Tag",
         ];
 
-        dump(static::callCreator($params));
+        dump(static::callCreator($params2));
     }
 
     public static function callCreator(array $params) : array
     {
-        if ($params["tableShard"]) {
-            $inputParams = [
-                "tableShard"    => $params["tableShard"],
-                "shardCount"    => $params["shardCount"],
-                "maxShardCount" => 64,
-                "tablePrefix"   => $params["tablePrefix"],
-                "tableName"     => $params["tableName"],
-                "controls"      => $params["controls"],
-            ];
-        } else {
-            $inputParams = [
-                "tableShard"  => $params["tableShard"],
-                "tablePrefix" => $params["tablePrefix"],
-                "tableName"   => $params["tableName"],
-                "controls"    => $params["controls"],
-            ];
-        }
+        $inputParams = [
+            "tableShard"    => $params["tableShard"],
+            "shardCount"    => $params["shardCount"],
+            "maxShardCount" => $params["maxShardCount"],
+            "tablePrefix"   => $params["tablePrefix"],
+            "tableName"     => $params["tableName"],
+            "controls"      => $params["controls"],
+        ];
 
         if ( !static::validateControlName($inputParams["controls"])) {
             throw new \Exception("格式有误，参考格式: A.B 或 A.B.C ");
