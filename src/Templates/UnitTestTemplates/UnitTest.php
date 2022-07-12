@@ -73,11 +73,11 @@ class UnitTest implements TemplateHandleContract
     {
         $fullControlName = $this->getControlName();
 
-        $controlName = $this->processControlName($fullControlName);
+        $controlName = static::processControlName($fullControlName);
 
-        $namespacePath = $this->processNamespacePath($fullControlName);
+        $namespacePath = static::processNamespacePath($fullControlName);
 
-        $directoryPath = $this->processDirectoryPath($fullControlName);
+        $directoryPath = static::processDirectoryPath($fullControlName);
 
         //********************************************************
 

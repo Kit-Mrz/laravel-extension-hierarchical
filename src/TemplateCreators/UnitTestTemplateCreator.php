@@ -16,20 +16,20 @@ class UnitTestTemplateCreator implements TemplateCreatorContract
     private $controlName;
 
     /**
-     * @var TableInformationContract
-     */
-    private $tableInformationContract;
-
-    /**
      * @var TemplateHandlerContract
      */
     private $templateHandlerContract;
 
-    public function __construct(string $controlName, TableInformationContract $tableInformationContract, TemplateHandlerContract $templateHandlerContract)
+    /**
+     * @var TableInformationContract
+     */
+    private $tableInformationContract;
+
+    public function __construct(string $controlName, TemplateHandlerContract $templateHandlerContract, TableInformationContract $tableInformationContract)
     {
         $this->controlName              = $controlName;
-        $this->tableInformationContract = $tableInformationContract;
         $this->templateHandlerContract  = $templateHandlerContract;
+        $this->tableInformationContract = $tableInformationContract;
     }
 
     protected function createUnitTest() : TemplateHandleContract

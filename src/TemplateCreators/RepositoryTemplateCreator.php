@@ -13,20 +13,21 @@ use Mrzkit\LaravelExtensionHierarchical\Templates\RepositoryTemplates\ModelRepos
 
 class RepositoryTemplateCreator implements TemplateCreatorContract
 {
-    /**
-     * @var TableInformationContract
-     */
-    private $tableInformationContract;
 
     /**
      * @var TemplateHandlerContract
      */
     private $templateHandlerContract;
 
-    public function __construct(TableInformationContract $tableInformationContract, TemplateHandlerContract $templateHandlerContract)
+    /**
+     * @var TableInformationContract
+     */
+    private $tableInformationContract;
+
+    public function __construct(TemplateHandlerContract $templateHandlerContract, TableInformationContract $tableInformationContract)
     {
-        $this->tableInformationContract = $tableInformationContract;
         $this->templateHandlerContract  = $templateHandlerContract;
+        $this->tableInformationContract = $tableInformationContract;
     }
 
     protected function createModel() : TemplateHandleContract

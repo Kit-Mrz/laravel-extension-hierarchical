@@ -40,13 +40,13 @@ class Route implements TemplateHandleContract
     {
         $fullControlName = $this->getControlName();
 
-        $firstControlName = $this->processFirstControlName($fullControlName);
+        $firstControlName = static::processFirstControlName($fullControlName);
 
-        $controlName = $this->processControlName($fullControlName);
+        $controlName = static::processControlName($fullControlName);
 
-        $namespacePath = $this->processNamespacePath($fullControlName);
+        $namespacePath = static::processNamespacePath($fullControlName);
 
-        $directoryPath = $this->processDirectoryPath($fullControlName);
+        $directoryPath = static::processDirectoryPath($fullControlName);
 
         $controlPathName = Str::snake($controlName, '-');
 

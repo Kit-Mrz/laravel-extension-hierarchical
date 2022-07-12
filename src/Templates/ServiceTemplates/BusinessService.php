@@ -30,10 +30,6 @@ class BusinessService implements TemplateHandleContract
 
     public function __construct(string $controlName, TableInformationContract $tableInformationContract)
     {
-        if ( !$this->validateControlName($controlName)) {
-            throw new \Exception("格式有误，参考格式: A.B 或 A.B.C ");
-        }
-
         $this->controlName              = $controlName;
         $this->tableInformationContract = $tableInformationContract;
         $this->codeTemplate             = new CodeTemplate($tableInformationContract);
@@ -79,11 +75,11 @@ class BusinessService implements TemplateHandleContract
     {
         $fullControlName = $this->getControlName();
 
-        $controlName = $this->processControlName($fullControlName);
+        $controlName = static::processControlName($fullControlName);
 
-        $namespacePath = $this->processNamespacePath($fullControlName);
+        $namespacePath = static::processNamespacePath($fullControlName);
 
-        $directoryPath = $this->processDirectoryPath($fullControlName);
+        $directoryPath = static::processDirectoryPath($fullControlName);
 
         //********************************************************
 

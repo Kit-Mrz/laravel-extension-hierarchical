@@ -2,21 +2,19 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical;
 
-use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\ComponentCreator;
+use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\ControllerTemplateCreator;
+use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\RepositoryTemplateCreator;
+use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\RequestTemplateCreator;
 use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\RouteTemplateCreator;
+use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\ServiceTemplateCreator;
 use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\UnitTestTemplateCreator;
 
 class Tester
 {
+    use TemplateTool;
+
     public static function testRunner()
     {
-        $params = [
-            "tableShard" => 0,
-            "prefix"     => env('DB_PREFIX', ""),
-            "tableName"  => "tags",
-            "controls"   => "CpcSystem.Tag",
-        ];
-
         $params = [
             "tableShard"    => 1,
             "shardCount"    => 2,
@@ -26,35 +24,81 @@ class Tester
             "controls"      => "CpcSystem.RenewalPayments",
         ];
 
-//        if ( !$this->validateControlName($controlName)) {
-//            throw new \Exception("格式有误，参考格式: A.B 或 A.B.C ");
-//        }
+        $params = [
+            "tableShard" => 0,
+            "prefix"     => env('DB_PREFIX', ""),
+            "tableName"  => "tags",
+            "controls"   => "CpcSystem.Tag",
+        ];
 
-        $tableInformation = new TableInformation($params["tableName"], $params["tablePrefix"], $params["tableShard"], $params["shardCount"], $params["maxShardCount"]);
+        dump(static::callCreator($params));
+    }
+
+    public static function callCreator(array $params) : array
+    {
+        if ($params["tableShard"]) {
+            $inputParams = [
+                "tableShard"    => $params["tableShard"],
+                "shardCount"    => $params["shardCount"],
+                "maxShardCount" => 64,
+                "tablePrefix"   => $params["tablePrefix"],
+                "tableName"     => $params["tableName"],
+                "controls"      => $params["controls"],
+            ];
+        } else {
+            $inputParams = [
+                "tableShard"  => $params["tableShard"],
+                "tablePrefix" => $params["tablePrefix"],
+                "tableName"   => $params["tableName"],
+                "controls"    => $params["controls"],
+            ];
+        }
+
+        if ( !static::validateControlName($inputParams["controls"])) {
+            throw new \Exception("格式有误，参考格式: A.B 或 A.B.C ");
+        }
+
+        $tableInformation = new TableInformation($inputParams["tableName"], $inputParams["tablePrefix"], $inputParams["tableShard"], $inputParams["shardCount"], $inputParams["maxShardCount"]);
 
         $templateHandler = new TemplateHandler();
 
-//        // Repository
-//        $creator = new RepositoryTemplateCreator($tableInformation, $templateHandler);
-//        dump($creator->handle());
-//        // Service
-//        $creator = new ServiceTemplateCreator($params["controls"], $tableInformation, $templateHandler);
-//        dump($creator->handle());
-//        // Request
-//        $creator = new RequestTemplateCreator($params["controls"], $tableInformation, $templateHandler);
-//        dump($creator->handle());
-//        // Controller
-//        $creator = new ControllerTemplateCreator($params["controls"], $templateHandler);
-//        dump($creator->handle());
+        $result = [];
+
+        // Repository
+        $creator = new RepositoryTemplateCreator($templateHandler, $tableInformation);
+
+        $result["RepositoryTemplateCreator"] = $creator->handle();
+
+        // Service
+        $creator = new ServiceTemplateCreator($inputParams["controls"], $templateHandler, $tableInformation);
+
+        $result["ServiceTemplateCreator"] = $creator->handle();
+
+        // Request
+        $creator = new RequestTemplateCreator($inputParams["controls"], $templateHandler, $tableInformation);
+
+        $result["RequestTemplateCreator"] = $creator->handle();
+
+        // Controller
+        $creator = new ControllerTemplateCreator($inputParams["controls"], $templateHandler);
+
+        $result["ControllerTemplateCreator"] = $creator->handle();
+
         // Route
-        $creator = new RouteTemplateCreator($params["controls"], $templateHandler);
-        dump($creator->handle());
+        $creator = new RouteTemplateCreator($inputParams["controls"], $templateHandler);
+
+        $result["RouteTemplateCreator"] = $creator->handle();
+
         // UnitTest
-        $creator = new UnitTestTemplateCreator($params["controls"], $tableInformation, $templateHandler);
-        dump($creator->handle());
+        $creator = new UnitTestTemplateCreator($inputParams["controls"], $templateHandler, $tableInformation);
+
+        $result["UnitTestTemplateCreator"] = $creator->handle();
+
         // Component
-        $creator = new ComponentCreator("Util", $templateHandler);
-        dump($creator->handle());
+        //$creator = new ComponentCreator("Util", $templateHandler);
+        //$result["ComponentCreator"] = $creator->handle();
+
+        return $result;
     }
 
 }

@@ -4,7 +4,7 @@ namespace Mrzkit\LaravelExtensionHierarchical;
 
 trait TemplateTool
 {
-    public function validateControlName(string $controlName) : bool
+    public static function validateControlName(string $controlName) : bool
     {
         $pattern = "/^[A-Za-z](\w+)?(\.?\w+)?/";
 
@@ -15,7 +15,7 @@ trait TemplateTool
         return false;
     }
 
-    public function processFirstControlName(string $controlName) : string
+    public static function processFirstControlName(string $controlName) : string
     {
         $numericalPosition = strpos($controlName, '.');
 
@@ -28,7 +28,7 @@ trait TemplateTool
         return $firstControlName;
     }
 
-    public function processControlName(string $controlName) : string
+    public static function processControlName(string $controlName) : string
     {
         $numericalPosition = strripos($controlName, '.');
 
@@ -39,7 +39,7 @@ trait TemplateTool
         return $controlName;
     }
 
-    public function processNamespacePath(string $controlName) : string
+    public static function processNamespacePath(string $controlName) : string
     {
         $numericalPosition = strripos($controlName, '.');
 
@@ -53,9 +53,9 @@ trait TemplateTool
         return $namespacePath;
     }
 
-    public function processDirectoryPath(string $controlName) : string
+    public static function processDirectoryPath(string $controlName) : string
     {
-        $namespacePath = $this->processNamespacePath($controlName);
+        $namespacePath = static::processNamespacePath($controlName);
 
         $directoryPath = str_replace('\\', DIRECTORY_SEPARATOR, $namespacePath);
 
