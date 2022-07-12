@@ -2,6 +2,7 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical;
 
+use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\ComponentCreator;
 use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\ControllerTemplateCreator;
 use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\RepositoryTemplateCreator;
 use Mrzkit\LaravelExtensionHierarchical\TemplateCreators\RequestTemplateCreator;
@@ -87,9 +88,53 @@ class Tester
 
         $result["UnitTestTemplateCreator"] = $creator->handle();
 
+        return $result;
+    }
+
+    public static function callSimpleCreator(array $params) : array
+    {
+        $inputParams = [
+            "tableShard"    => $params["tableShard"],
+            "shardCount"    => $params["shardCount"],
+            "maxShardCount" => $params["maxShardCount"],
+            "tablePrefix"   => $params["tablePrefix"],
+            "tableName"     => $params["tableName"],
+            "controls"      => $params["controls"],
+        ];
+
+        if ( !static::validateControlName($inputParams["controls"])) {
+            throw new \Exception("格式有误，参考格式: A.B 或 A.B.C ");
+        }
+
+        $tableInformation = new TableInformation($inputParams["tableName"], $inputParams["tablePrefix"], $inputParams["tableShard"], $inputParams["shardCount"], $inputParams["maxShardCount"]);
+
+        $templateHandler = new TemplateHandler();
+
+        $result = [];
+
+        // Repository
+        $creator = new RepositoryTemplateCreator($templateHandler, $tableInformation);
+
+        $result["RepositoryTemplateCreator"] = $creator->handle();
+
+        // Service
+        $creator = new ServiceTemplateCreator($inputParams["controls"], $templateHandler, $tableInformation);
+
+        $result["ServiceTemplateCreator"] = $creator->handle();
+
+        return $result;
+    }
+
+    public static function callComponentCreator(string $componentName) : array
+    {
+        $templateHandler = new TemplateHandler();
+
+        $result = [];
+
         // Component
-        //$creator = new ComponentCreator("Util", $templateHandler);
-        //$result["ComponentCreator"] = $creator->handle();
+        $creator = new ComponentCreator($componentName, $templateHandler);
+
+        $result["ComponentCreator"] = $creator->handle();
 
         return $result;
     }
