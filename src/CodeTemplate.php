@@ -467,6 +467,7 @@ class CodeTemplate
                 $val      = mt_rand(0, $matchResult["max"] ?? 2147483647);;
             } else if ( !empty($matcher->matchString())) {
                 $text     = $faker->realTextBetween(5, 100);
+                $text     = addslashes($text);
                 $template = '"%s" => %s %s,%s';
                 $type     = "(string)";
                 $val      = "\"{$text}\"";
@@ -477,6 +478,7 @@ class CodeTemplate
                 $val      = "{$text}";
             } else {
                 $text     = $faker->realTextBetween(5, 100);
+                $text     = addslashes($text);
                 $template = '"%s" => %s %s,%s';
                 $type     = "(string)";
                 $val      = "{$text}";
@@ -515,7 +517,7 @@ class CodeTemplate
                 $max      = $matchResult["max"] ?? 100;
                 $template = '"%s" => %s %s,%s';
                 $type     = "(string)";
-                $val      = "\$this->getFaker()->realTextBetween(5, {$max})";
+                $val      = "addslashes(\$this->getFaker()->realTextBetween(5, {$max}))";
             } else if ( !empty($matchResult = $matcher->matchDate())) {
                 $template = '"%s" => %s %s,%s';
                 $type     = "";
@@ -523,7 +525,7 @@ class CodeTemplate
             } else {
                 $template = '"%s" => %s %s,%s';
                 $type     = "(string)";
-                $val      = "\$this->getFaker()->realTextBetween(5, 100)";
+                $val      = "addslashes(\$this->getFaker()->realTextBetween(5, 100))";
             }
             $codeString .= sprintf($template, $camelField, $type, $val, "\r\n");
             //****
