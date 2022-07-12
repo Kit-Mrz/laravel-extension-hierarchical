@@ -467,6 +467,7 @@ class CodeTemplate
                 $val      = mt_rand(0, $matchResult["max"] ?? 2147483647);;
             } else if ( !empty($matcher->matchString())) {
                 $text     = $faker->realTextBetween(5, 100);
+                $text     = str_replace('"', '', $text);
                 $text     = addslashes($text);
                 $template = '"%s" => %s %s,%s';
                 $type     = "(string)";
@@ -478,6 +479,7 @@ class CodeTemplate
                 $val      = "{$text}";
             } else {
                 $text     = $faker->realTextBetween(5, 100);
+                $text     = str_replace('"', '', $text);
                 $text     = addslashes($text);
                 $template = '"%s" => %s %s,%s';
                 $type     = "(string)";
