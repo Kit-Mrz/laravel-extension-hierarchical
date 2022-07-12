@@ -2,88 +2,78 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical\TemplateCreators;
 
-use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\Model;
-use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\ModelRepository;
-use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\ModelRepositoryComplex;
-use Mrzkit\LaravelExtensionHierarchical\RepositoryTemplates\ModelRepositoryFactory;
-use Mrzkit\LaravelExtensionHierarchical\TemplateContract;
-use Mrzkit\LaravelExtensionHierarchical\TemplateHandler;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TableInformationContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateCreatorContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandleContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandlerContract;
+use Mrzkit\LaravelExtensionHierarchical\Templates\RepositoryTemplates\Model;
+use Mrzkit\LaravelExtensionHierarchical\Templates\RepositoryTemplates\ModelRepository;
+use Mrzkit\LaravelExtensionHierarchical\Templates\RepositoryTemplates\ModelRepositoryComplex;
+use Mrzkit\LaravelExtensionHierarchical\Templates\RepositoryTemplates\ModelRepositoryFactory;
 
 class RepositoryTemplateCreator implements TemplateCreatorContract
 {
     /**
-     * @var string
+     * @var TableInformationContract
      */
-    private $tableName;
+    private $tableInformationContract;
 
     /**
-     * @var string
+     * @var TemplateHandlerContract
      */
-    private $tablePrefix;
+    private $templateHandlerContract;
 
-    /**
-     * @var bool
-     */
-    private $shard;
-
-    /**
-     * @var TemplateHandler
-     */
-    private $templateHandler;
-
-    public function __construct(string $tableName, string $tablePrefix = '', bool $shard = false)
+    public function __construct(TableInformationContract $tableInformationContract, TemplateHandlerContract $templateHandlerContract)
     {
-        $this->tableName       = $tableName;
-        $this->tablePrefix     = $tablePrefix;
-        $this->shard           = $shard;
-        $this->templateHandler = new TemplateHandler();
+        $this->tableInformationContract = $tableInformationContract;
+        $this->templateHandlerContract  = $templateHandlerContract;
     }
 
-    protected function createModel() : TemplateContract
+    protected function createModel() : TemplateHandleContract
     {
-        return new Model($this->tableName, $this->tablePrefix, $this->shard);
+        return new Model($this->tableInformationContract);
     }
 
-    protected function createModelRepository() : TemplateContract
+    protected function createModelRepository() : TemplateHandleContract
     {
-        return new ModelRepository($this->tableName, $this->tablePrefix, $this->shard);
+        return new ModelRepository($this->tableInformationContract);
     }
 
-    protected function createModelRepositoryComplex() : TemplateContract
+    protected function createModelRepositoryComplex() : TemplateHandleContract
     {
-        return new ModelRepositoryComplex($this->tableName, $this->tablePrefix, $this->shard);
+        return new ModelRepositoryComplex($this->tableInformationContract);
     }
 
-    protected function createModelRepositoryFactory() : TemplateContract
+    protected function createModelRepositoryFactory() : TemplateHandleContract
     {
-        return new ModelRepositoryFactory($this->tableName, $this->tablePrefix, $this->shard);
+        return new ModelRepositoryFactory($this->tableInformationContract);
     }
 
     public function handle() : array
     {
         $result = [];
 
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createModel());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createModel()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
 
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createModelRepository());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createModelRepository()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
 
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createModelRepositoryComplex());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createModelRepositoryComplex()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
 
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createModelRepositoryFactory());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createModelRepositoryFactory()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
 

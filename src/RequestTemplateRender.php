@@ -2,6 +2,8 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical;
 
+use Mrzkit\LaravelExtensionHierarchical\Contracts\RequestTemplateRenderContract;
+
 class RequestTemplateRender implements RequestTemplateRenderContract
 {
     /**

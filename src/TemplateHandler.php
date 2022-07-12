@@ -2,11 +2,13 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical;
 
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandlerContract;
 use Mrzkit\TemplateEngine\TemplateEngine;
 use Mrzkit\TemplateEngine\TemplateFileReader;
 use Mrzkit\TemplateEngine\TemplateFileWriter;
 
-class TemplateHandler
+class TemplateHandler implements TemplateHandlerContract
 {
     /**
      * @var TemplateContract
@@ -31,55 +33,37 @@ class TemplateHandler
         return $this;
     }
 
-    public function execute() : bool
+    public function getWriteResult() : bool
     {
-        return $this->handle($this->getTemplateContract());
-    }
-
-    public function handle(TemplateContract $templateContract) : bool
-    {
-        // 执行
-        $templateContract->handle();
-        // 读取文件
+        $templateContract = $this->getTemplateContract();
+        //
         $reader = new TemplateFileReader($templateContract->getSourceTemplateFile());
-        // 实例化替换引擎
+        //
         $engine = new TemplateEngine($reader);
-        // 初始化配置
+        //
         $engine->setContentReplacements($templateContract->getReplacementRules())->setContentReplacementsCallback($templateContract->getReplacementRuleCallbacks());
-        // 执行替换
+        //
         $engine->replaceContentReplacements()->replaceContentReplacementsCallback();
-        // 写入文件
+        //
         $writer = new TemplateFileWriter($templateContract->getSaveFilename());
-        // 写入操作
+        //
         $result = $writer->setContent($engine->getReplaceResult())->setForce($templateContract->getForceCover())->saveFile();
 
         return $result;
     }
 
-    public function executeReplace() : string
+    public function getReplaceResult() : string
     {
-        return $this->handleReplace($this->getTemplateContract());
-    }
-
-    /**
-     * @desc 不写入，仅替换
-     * @param TemplateContract $templateContract
-     * @return string
-     */
-    public function handleReplace(TemplateContract $templateContract) : string
-    {
-        // 执行
-        $templateContract->handle();
-        // 读取文件
+        $templateContract = $this->getTemplateContract();
+        //
         $reader = new TemplateFileReader($templateContract->getSourceTemplateFile());
-        // 实例化替换引擎
+        //
         $engine = new TemplateEngine($reader);
-        // 初始化配置
+        //
         $engine->setContentReplacements($templateContract->getReplacementRules())->setContentReplacementsCallback($templateContract->getReplacementRuleCallbacks());
-        // 执行替换
+        //
         $engine->replaceContentReplacements()->replaceContentReplacementsCallback();
 
-        // 返回替换结果
         return $engine->getReplaceResult();
     }
 }

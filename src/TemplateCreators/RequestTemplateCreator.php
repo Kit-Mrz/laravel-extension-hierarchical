@@ -2,14 +2,16 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical\TemplateCreators;
 
-use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\BatchStoreRequest;
-use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\BatchUpdateRequest;
-use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\IndexRequest;
-use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\ManyRequest;
-use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\StoreRequest;
-use Mrzkit\LaravelExtensionHierarchical\RequestTemplates\UpdateRequest;
-use Mrzkit\LaravelExtensionHierarchical\TemplateContract;
-use Mrzkit\LaravelExtensionHierarchical\TemplateHandler;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TableInformationContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateCreatorContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandleContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandlerContract;
+use Mrzkit\LaravelExtensionHierarchical\Templates\RequestTemplates\BatchStoreRequest;
+use Mrzkit\LaravelExtensionHierarchical\Templates\RequestTemplates\BatchUpdateRequest;
+use Mrzkit\LaravelExtensionHierarchical\Templates\RequestTemplates\IndexRequest;
+use Mrzkit\LaravelExtensionHierarchical\Templates\RequestTemplates\ManyRequest;
+use Mrzkit\LaravelExtensionHierarchical\Templates\RequestTemplates\StoreRequest;
+use Mrzkit\LaravelExtensionHierarchical\Templates\RequestTemplates\UpdateRequest;
 
 class RequestTemplateCreator implements TemplateCreatorContract
 {
@@ -19,90 +21,84 @@ class RequestTemplateCreator implements TemplateCreatorContract
     private $controlName;
 
     /**
-     * @var string
+     * @var TableInformationContract
      */
-    private $tableName;
+    private $tableInformationContract;
 
     /**
-     * @var string
+     * @var TemplateHandlerContract
      */
-    private $tablePrefix;
+    private $templateHandlerContract;
 
-    /**
-     * @var TemplateHandler
-     */
-    private $templateHandler;
-
-    public function __construct(string $controlName, string $tableName, string $tablePrefix = '')
+    public function __construct(string $controlName, TableInformationContract $tableInformationContract, TemplateHandlerContract $templateHandlerContract)
     {
-        $this->controlName     = $controlName;
-        $this->tableName       = $tableName;
-        $this->tablePrefix     = $tablePrefix;
-        $this->templateHandler = new TemplateHandler();
+        $this->controlName              = $controlName;
+        $this->tableInformationContract = $tableInformationContract;
+        $this->templateHandlerContract  = $templateHandlerContract;
     }
 
-    protected function createIndexRequest() : TemplateContract
+    protected function createIndexRequest() : TemplateHandleContract
     {
-        return new IndexRequest($this->controlName, $this->tableName, $this->tablePrefix);
+        return new IndexRequest($this->controlName);
     }
 
-    protected function createManyRequest() : TemplateContract
+    protected function createManyRequest() : TemplateHandleContract
     {
-        return new ManyRequest($this->controlName, $this->tableName, $this->tablePrefix);
+        return new ManyRequest($this->controlName);
     }
 
-    protected function createStoreRequest() : TemplateContract
+    protected function createStoreRequest() : TemplateHandleContract
     {
-        return new StoreRequest($this->controlName, $this->tableName, $this->tablePrefix);
+        return new StoreRequest($this->controlName, $this->tableInformationContract);
     }
 
-    protected function createUpdateRequest() : TemplateContract
+    protected function createUpdateRequest() : TemplateHandleContract
     {
-        return new UpdateRequest($this->controlName, $this->tableName, $this->tablePrefix);
+        return new UpdateRequest($this->controlName, $this->tableInformationContract);
     }
 
-    protected function createBatchStoreRequest() : TemplateContract
+    protected function createBatchStoreRequest() : TemplateHandleContract
     {
-        return new BatchStoreRequest($this->controlName, $this->tableName, $this->tablePrefix);
+        return new BatchStoreRequest($this->controlName, $this->tableInformationContract);
     }
 
-    protected function createBatchUpdateRequest() : TemplateContract
+    protected function createBatchUpdateRequest() : TemplateHandleContract
     {
-        return new BatchUpdateRequest($this->controlName, $this->tableName, $this->tablePrefix);
+        return new BatchUpdateRequest($this->controlName, $this->tableInformationContract);
     }
 
     public function handle() : array
     {
         $result = [];
 
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createIndexRequest());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createIndexRequest()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createManyRequest());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createManyRequest()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createStoreRequest());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createStoreRequest()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createUpdateRequest());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createUpdateRequest()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createBatchStoreRequest());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createBatchStoreRequest()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createBatchUpdateRequest());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createBatchUpdateRequest()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
 

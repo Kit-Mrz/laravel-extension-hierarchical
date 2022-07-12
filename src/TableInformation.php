@@ -5,6 +5,7 @@ namespace Mrzkit\LaravelExtensionHierarchical;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TableInformationContract;
 
 class TableInformation implements TableInformationContract
 {
@@ -16,6 +17,10 @@ class TableInformation implements TableInformationContract
     private $tableFullName;
     // 分表
     private $tableShard;
+    // 期望分表数
+    private $shardCount;
+    // 最大分表数
+    private $maxShardCount;
     // 表信息
     private $tableFullColumns;
     // 表字段
@@ -23,12 +28,14 @@ class TableInformation implements TableInformationContract
     // 表后缀
     private $tableSuffix;
 
-    public function __construct(string $tableName, string $tablePrefix = '')
+    public function __construct(string $tableName, string $tablePrefix = '', bool $tableShard = false, int $shardCount = 2, int $maxShardCount = 64)
     {
-        $this->tablePrefix      = $tablePrefix;
         $this->tableName        = $tableName;
+        $this->tablePrefix      = $tablePrefix;
         $this->tableFullName    = $this->tablePrefix . $this->tableName;
-        $this->tableShard       = false;
+        $this->tableShard       = $tableShard;
+        $this->shardCount       = $shardCount;
+        $this->maxShardCount    = $maxShardCount;
         $this->tableFullColumns = [];
         $this->tableFields      = [];
         $this->tableSuffix      = "";
@@ -38,75 +45,70 @@ class TableInformation implements TableInformationContract
         $this->initTableFields();
     }
 
+    private function initNormalTable()
+    {
+        $this->tablePrefix = strlen($this->getTablePrefix()) > 0 ? Str::snake($this->getTablePrefix()) : $this->getTablePrefix();
+
+        $tableName = Str::snake($this->getTableName());
+
+        if ( !Schema::hasTable($tableName)) {
+            throw new \InvalidArgumentException("Not exists Normal table: {$tableName}.");
+        }
+
+        $this->tableName     = Str::snake($tableName);
+        $this->tableFullName = Str::snake($this->tablePrefix . $this->tableName);
+        $this->tableShard    = false;
+        $this->tableSuffix   = "";
+    }
+
+    private function initShardTable()
+    {
+        $this->tablePrefix = strlen($this->getTablePrefix()) > 0 ? Str::snake($this->getTablePrefix()) : $this->getTablePrefix();
+
+        if ($this->getShardCount() < 2 || $this->getShardCount() > $this->getMaxShardCount()) {
+            throw new \Exception("分表数必须是2~64");
+        }
+
+        if ( !$this->isPower($this->getShardCount())) {
+            throw new \Exception("分表数必须是2次方数");
+        }
+
+        $listSuffix = $this->getSuffixCount();
+
+        if (empty($listSuffix)) {
+            throw new \Exception("分表后缀为空");
+        }
+
+        $shardTableName = "";
+
+        $tableSuffix = "";
+
+        foreach ($listSuffix as $itemSuffix) {
+            $shardTableName = $this->getTableName() . '_' . $itemSuffix;
+
+            if ( !Schema::hasTable($shardTableName)) {
+                throw new \InvalidArgumentException("Not exists Shard table: {$shardTableName}.");
+            }
+
+            $tableSuffix = $itemSuffix;
+        }
+
+        $this->tableName     = Str::snake($shardTableName);
+        $this->tableFullName = Str::snake($this->tablePrefix . $this->tableName);
+        $this->tableShard    = true;
+        $this->tableSuffix   = $tableSuffix;
+    }
+
     /**
      * @desc 表初始化
      * @return $this
      */
-    public function initTable()
+    private function initTable()
     {
-        $this->tablePrefix = strlen($this->tablePrefix) > 0 ? Str::snake($this->tablePrefix) : $this->tablePrefix;
-
-        $tableName = Str::snake($this->getTableName());
-
-        // 猜测表名
-        $listSuffix = [
-            2   => '_2',
-            4   => '_4',
-            8   => '_8',
-            16  => '_16',
-            32  => '_32',
-            64  => '_64',
-            128 => '_128',
-            256 => '_256',
-        ];
-
-        if (Schema::hasTable($tableName)) {
-            $this->tableName     = Str::snake($tableName);
-            $this->tableFullName = Str::snake($this->tablePrefix . $this->tableName);
-            $this->tableShard    = false;
-            $this->tableSuffix   = "";
-        } else if (Schema::hasTable($tableName . $listSuffix[2])) {
-            $this->tableName     = Str::snake($tableName . $listSuffix[2]);
-            $this->tableFullName = Str::snake($this->tablePrefix . $this->tableName);
-            $this->tableShard    = true;
-            $this->tableSuffix   = $listSuffix[2];
-        } else if (Schema::hasTable($tableName . $listSuffix[4])) {
-            $this->tableName     = Str::snake($tableName . $listSuffix[4]);
-            $this->tableFullName = Str::snake($this->tablePrefix . $this->tableName);
-            $this->tableShard    = true;
-            $this->tableSuffix   = $listSuffix[4];
-        } else if (Schema::hasTable($tableName . $listSuffix[8])) {
-            $this->tableName     = Str::snake($tableName . $listSuffix[8]);
-            $this->tableFullName = Str::snake($this->tablePrefix . $this->tableName);
-            $this->tableShard    = true;
-            $this->tableSuffix   = $listSuffix[8];
-        } else if (Schema::hasTable($tableName . $listSuffix[16])) {
-            $this->tableName     = Str::snake($tableName . $listSuffix[16]);
-            $this->tableFullName = Str::snake($this->tablePrefix . $this->tableName);
-            $this->tableShard    = true;
-            $this->tableSuffix   = $listSuffix[16];
-        } else if (Schema::hasTable($tableName . $listSuffix[32])) {
-            $this->tableName     = Str::snake($tableName . $listSuffix[32]);
-            $this->tableFullName = Str::snake($this->tablePrefix . $this->tableName);
-            $this->tableShard    = true;
-            $this->tableSuffix   = $listSuffix[32];
-        } else if (Schema::hasTable($tableName . $listSuffix[64])) {
-            $this->tableName     = Str::snake($tableName . $listSuffix[64]);
-            $this->tableFullName = Str::snake($this->tablePrefix . $this->tableName);
-            $this->tableShard    = true;
-            $this->tableSuffix   = $listSuffix[64];
-        } else if (Schema::hasTable($tableName . $listSuffix[128])) {
-            $this->tableName     = Str::snake($tableName . $listSuffix[128]);
-            $this->tableFullName = Str::snake($this->tablePrefix . $this->tableName);
-            $this->tableShard    = true;
-            $this->tableSuffix   = $listSuffix[128];
-        } else if (Schema::hasTable($tableName . $listSuffix[256])) {
-            $this->tableName     = Str::snake($tableName . $listSuffix[256]);
-            $this->tableFullName = Str::snake($this->tablePrefix . $this->tableName);
-            $this->tableShard    = true;
-            $this->tableSuffix   = $listSuffix[256];
+        if ($this->getTableShard()) {
+            $this->initShardTable();
         } else {
-            throw new \InvalidArgumentException("Not exists table.");
+            $this->initNormalTable();
         }
 
         return $this;
@@ -116,7 +118,7 @@ class TableInformation implements TableInformationContract
      * @desc 表信息初始化
      * @return $this
      */
-    public function initTableFullColumns()
+    private function initTableFullColumns()
     {
         $tableFullName = $this->getTableFullName();
 
@@ -139,7 +141,7 @@ class TableInformation implements TableInformationContract
      * @desc 表字段初始化
      * @return $this
      */
-    public function initTableFields()
+    private function initTableFields()
     {
         $tableFields = [];
 
@@ -185,6 +187,14 @@ class TableInformation implements TableInformationContract
     }
 
     /**
+     * @return int
+     */
+    public function getShardCount() : int
+    {
+        return $this->shardCount;
+    }
+
+    /**
      * @return array
      */
     public function getTableFullColumns() : array
@@ -206,5 +216,76 @@ class TableInformation implements TableInformationContract
     public function getTableSuffix() : string
     {
         return $this->tableSuffix;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxShardCount() : int
+    {
+        return $this->maxShardCount;
+    }
+
+    /**
+     * @desc
+     * @param int $n
+     * @return bool
+     */
+    public function isPower(int $n) : bool
+    {
+        if ($n < 2) {
+            return false;
+        }
+
+        if (($n & ($n - 1)) == 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @desc
+     * @return array
+     */
+    public function getSuffixCount() : array
+    {
+        $maxShardCount = $this->getMaxShardCount();
+
+        $shardCount = $this->getShardCount();
+
+        $suffixConfig = [];
+
+        for ($i = 0; $i < $shardCount; $i++) {
+            $part = $maxShardCount / $shardCount;
+
+            $suffixConfig[] = ($i + 1) * $part;
+        }
+
+        return $suffixConfig;
+    }
+
+    /**
+     * @desc
+     * @return array
+     */
+    public function getShardCountConfig() : array
+    {
+        $maxShardCount = $this->getMaxShardCount();
+        $shardCount    = $this->getShardCount();
+
+        $shardCountConfig = [];
+
+        for ($i = 0; $i < $shardCount; $i++) {
+            $part = $maxShardCount / $shardCount;
+
+            $shardCountConfig[] = [
+                'partition' => ($i + 1) * $part,
+                'low'       => $i * $part,
+                'high'      => ($i + 1) * $part - 1,
+            ];
+        }
+
+        return $shardCountConfig;
     }
 }

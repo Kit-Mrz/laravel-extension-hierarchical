@@ -2,12 +2,14 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical\TemplateCreators;
 
-use Mrzkit\LaravelExtensionHierarchical\ServiceTemplates\BusinessService;
-use Mrzkit\LaravelExtensionHierarchical\ServiceTemplates\RenderService;
-use Mrzkit\LaravelExtensionHierarchical\ServiceTemplates\Service;
-use Mrzkit\LaravelExtensionHierarchical\ServiceTemplates\ServiceFactory;
-use Mrzkit\LaravelExtensionHierarchical\TemplateContract;
-use Mrzkit\LaravelExtensionHierarchical\TemplateHandler;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TableInformationContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateCreatorContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandleContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandlerContract;
+use Mrzkit\LaravelExtensionHierarchical\Templates\ServiceTemplates\BusinessService;
+use Mrzkit\LaravelExtensionHierarchical\Templates\ServiceTemplates\RenderService;
+use Mrzkit\LaravelExtensionHierarchical\Templates\ServiceTemplates\Service;
+use Mrzkit\LaravelExtensionHierarchical\Templates\ServiceTemplates\ServiceFactory;
 
 class ServiceTemplateCreator implements TemplateCreatorContract
 {
@@ -17,76 +19,64 @@ class ServiceTemplateCreator implements TemplateCreatorContract
     private $controlName;
 
     /**
-     * @var string
+     * @var TableInformationContract
      */
-    private $tableName;
+    private $tableInformationContract;
 
     /**
-     * @var string
+     * @var TemplateHandlerContract
      */
-    private $tablePrefix;
+    private $templateHandlerContract;
 
-    /**
-     * @var bool
-     */
-    private $shard;
-
-    /**
-     * @var TemplateHandler
-     */
-    private $templateHandler;
-
-    public function __construct(string $controlName, string $tableName, string $tablePrefix = '', bool $shard = false)
+    public function __construct(string $controlName, TableInformationContract $tableInformationContract, TemplateHandlerContract $templateHandlerContract)
     {
-        $this->controlName     = $controlName;
-        $this->tableName       = $tableName;
-        $this->tablePrefix     = $tablePrefix;
-        $this->shard           = $shard;
-        $this->templateHandler = new TemplateHandler();
+        $this->controlName              = $controlName;
+        $this->tableInformationContract = $tableInformationContract;
+        $this->templateHandlerContract  = $templateHandlerContract;
     }
 
-    protected function createService() : TemplateContract
+    protected function createService() : TemplateHandleContract
     {
-        return new Service($this->controlName, $this->tableName, $this->tablePrefix, $this->shard);
+        return new Service($this->controlName, $this->tableInformationContract);
     }
 
-    protected function createBusinessService() : TemplateContract
+    protected function createBusinessService() : TemplateHandleContract
     {
-        return new BusinessService($this->controlName, $this->tableName, $this->tablePrefix, $this->shard);
+        return new BusinessService($this->controlName, $this->tableInformationContract);
     }
 
-    protected function createServiceFactory() : TemplateContract
+    protected function createServiceFactory() : TemplateHandleContract
     {
-        return new ServiceFactory($this->controlName, $this->tableName, $this->tablePrefix, $this->shard);
+        return new ServiceFactory($this->controlName, $this->tableInformationContract);
     }
 
-    protected function createRenderService() : TemplateContract
+    protected function createRenderService() : TemplateHandleContract
     {
-        return new RenderService($this->controlName, $this->tableName, $this->tablePrefix, $this->shard);
+        return new RenderService($this->controlName, $this->tableInformationContract);
     }
 
     public function handle() : array
     {
         $result = [];
 
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createService());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createService()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createBusinessService());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createBusinessService()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createServiceFactory());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createServiceFactory()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createRenderService());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createRenderService()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
 

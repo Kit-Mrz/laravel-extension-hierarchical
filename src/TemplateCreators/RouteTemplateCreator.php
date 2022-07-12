@@ -2,10 +2,11 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical\TemplateCreators;
 
-use Mrzkit\LaravelExtensionHierarchical\RouteTemplates\Route;
-use Mrzkit\LaravelExtensionHierarchical\RouteTemplates\RouteReplace;
-use Mrzkit\LaravelExtensionHierarchical\TemplateContract;
-use Mrzkit\LaravelExtensionHierarchical\TemplateHandler;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateCreatorContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandleContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandlerContract;
+use Mrzkit\LaravelExtensionHierarchical\Templates\RouteTemplates\Route;
+use Mrzkit\LaravelExtensionHierarchical\Templates\RouteTemplates\RouteReplace;
 
 class RouteTemplateCreator implements TemplateCreatorContract
 {
@@ -15,50 +16,38 @@ class RouteTemplateCreator implements TemplateCreatorContract
     private $controlName;
 
     /**
-     * @var string
+     * @var TemplateHandlerContract
      */
-    private $tableName;
+    private $templateHandlerContract;
 
-    /**
-     * @var string
-     */
-    private $tablePrefix;
-
-    /**
-     * @var TemplateHandler
-     */
-    private $templateHandler;
-
-    public function __construct(string $controlName, string $tableName, string $tablePrefix = '')
+    public function __construct(string $controlName, TemplateHandlerContract $templateHandlerContract)
     {
-        $this->controlName     = $controlName;
-        $this->tableName       = $tableName;
-        $this->tablePrefix     = $tablePrefix;
-        $this->templateHandler = new TemplateHandler();
+        $this->controlName             = $controlName;
+        $this->templateHandlerContract = $templateHandlerContract;
     }
 
-    protected function createRoute() : TemplateContract
+    protected function createRoute() : TemplateHandleContract
     {
-        return new Route($this->controlName, $this->tableName, $this->tablePrefix);
+        return new Route($this->controlName);
     }
 
-    protected function createRouteReplace(string $content) : TemplateContract
+    protected function createRouteReplace(string $content) : TemplateHandleContract
     {
-        return new RouteReplace($this->controlName, $content, $this->tableName, $this->tablePrefix);
+        return new RouteReplace($this->controlName, $content,);
     }
 
     public function handle() : array
     {
         $result = [];
 
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createRoute());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createRoute()->handle());
 
-        $replaceString = $templateHandler->executeReplace();
+        $replaceString = $templateHandler->getReplaceResult();
 
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createRouteReplace($replaceString));
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createRouteReplace($replaceString)->handle());
 
         $result[] = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
 

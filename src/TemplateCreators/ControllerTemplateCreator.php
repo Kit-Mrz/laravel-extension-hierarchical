@@ -2,9 +2,10 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical\TemplateCreators;
 
-use Mrzkit\LaravelExtensionHierarchical\ControllerTemplates\Controller;
-use Mrzkit\LaravelExtensionHierarchical\TemplateContract;
-use Mrzkit\LaravelExtensionHierarchical\TemplateHandler;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateCreatorContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandleContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandlerContract;
+use Mrzkit\LaravelExtensionHierarchical\Templates\ControllerTemplates\Controller;
 
 class ControllerTemplateCreator implements TemplateCreatorContract
 {
@@ -14,40 +15,28 @@ class ControllerTemplateCreator implements TemplateCreatorContract
     private $controlName;
 
     /**
-     * @var string
+     * @var TemplateHandlerContract
      */
-    private $tableName;
+    private $templateHandlerContract;
 
-    /**
-     * @var string
-     */
-    private $tablePrefix;
-
-    /**
-     * @var TemplateHandler
-     */
-    private $templateHandler;
-
-    public function __construct(string $controlName, string $tableName, string $tablePrefix = '')
+    public function __construct(string $controlName, TemplateHandlerContract $templateHandlerContract)
     {
-        $this->controlName     = $controlName;
-        $this->tableName       = $tableName;
-        $this->tablePrefix     = $tablePrefix;
-        $this->templateHandler = new TemplateHandler();
+        $this->controlName             = $controlName;
+        $this->templateHandlerContract = $templateHandlerContract;
     }
 
-    protected function createController() : TemplateContract
+    protected function createController() : TemplateHandleContract
     {
-        return new Controller($this->controlName, $this->tableName, $this->tablePrefix);
+        return new Controller($this->controlName);
     }
 
     public function handle() : array
     {
         $result = [];
 
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createController());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createController()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
 

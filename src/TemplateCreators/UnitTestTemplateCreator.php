@@ -2,9 +2,11 @@
 
 namespace Mrzkit\LaravelExtensionHierarchical\TemplateCreators;
 
-use Mrzkit\LaravelExtensionHierarchical\TemplateContract;
-use Mrzkit\LaravelExtensionHierarchical\TemplateHandler;
-use Mrzkit\LaravelExtensionHierarchical\UnitTestTemplates\UnitTest;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TableInformationContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateCreatorContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandleContract;
+use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandlerContract;
+use Mrzkit\LaravelExtensionHierarchical\Templates\UnitTestTemplates\UnitTest;
 
 class UnitTestTemplateCreator implements TemplateCreatorContract
 {
@@ -14,40 +16,34 @@ class UnitTestTemplateCreator implements TemplateCreatorContract
     private $controlName;
 
     /**
-     * @var string
+     * @var TableInformationContract
      */
-    private $tableName;
+    private $tableInformationContract;
 
     /**
-     * @var string
+     * @var TemplateHandlerContract
      */
-    private $tablePrefix;
+    private $templateHandlerContract;
 
-    /**
-     * @var TemplateHandler
-     */
-    private $templateHandler;
-
-    public function __construct(string $controlName, string $tableName, string $tablePrefix = '')
+    public function __construct(string $controlName, TableInformationContract $tableInformationContract, TemplateHandlerContract $templateHandlerContract)
     {
-        $this->controlName     = $controlName;
-        $this->tableName       = $tableName;
-        $this->tablePrefix     = $tablePrefix;
-        $this->templateHandler = new TemplateHandler();
+        $this->controlName              = $controlName;
+        $this->tableInformationContract = $tableInformationContract;
+        $this->templateHandlerContract  = $templateHandlerContract;
     }
 
-    protected function createUnitTest() : TemplateContract
+    protected function createUnitTest() : TemplateHandleContract
     {
-        return new UnitTest($this->controlName, $this->tableName, $this->tablePrefix);
+        return new UnitTest($this->controlName, $this->tableInformationContract);
     }
 
     public function handle() : array
     {
         $result = [];
 
-        $templateHandler = $this->templateHandler->setTemplateContract($this->createUnitTest());
+        $templateHandler = $this->templateHandlerContract->setTemplateContract($this->createUnitTest()->handle());
         $result[]        = [
-            'result'       => $templateHandler->execute(),
+            'result'       => $templateHandler->getWriteResult(),
             'saveFilename' => $templateHandler->getTemplateContract()->getSaveFilename(),
         ];
 
