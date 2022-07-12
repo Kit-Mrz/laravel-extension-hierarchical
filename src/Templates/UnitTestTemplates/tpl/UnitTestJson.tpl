@@ -41,11 +41,9 @@ class {{RNT}}ControllerTest extends BaseTest
      */
     public function testStore()
     {
-        $data = [
-            {{UNIT_TEST_STORE_CODE}}
-        ];
+        $data = '{{UNIT_TEST_STORE_CODE}}';
 
-        $dataJson = json_encode($data);
+        $data = json_decode($data, true);
 
         $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}";
 
@@ -83,11 +81,9 @@ class {{RNT}}ControllerTest extends BaseTest
     {
         $id = 2;
 
-        $data = [
-            {{UNIT_TEST_STORE_CODE}}
-        ];
+        $data = '{{UNIT_TEST_STORE_CODE}}';
 
-        $dataJson = json_encode($data);
+        $data = json_decode($data, true);
 
         $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}/{$id}";
 
@@ -125,11 +121,11 @@ class {{RNT}}ControllerTest extends BaseTest
      */
     public function testMany()
     {
-        $data = [
-            "ids" => [1, 2, 3],
-        ];
+        $data = '{
+            "ids": [1, 2, 3]
+        }';
 
-        $dataJson = json_encode($data);
+        $data = json_decode($data, true);
 
         $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}-ext/many";
 
@@ -147,11 +143,11 @@ class {{RNT}}ControllerTest extends BaseTest
      */
     public function testBatchDestroy()
     {
-        $data = [
-            "ids" => [1, 2, 3],
-        ];
+        $data = '{
+            "ids": [1, 2, 3]
+        }';
 
-        $dataJson = json_encode($data);
+        $data = json_decode($data, true);
 
         $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}-ext/batch-destroy";
 
@@ -169,16 +165,13 @@ class {{RNT}}ControllerTest extends BaseTest
      */
     public function testBatchStore()
     {
-        $data = [
-            "batch" => [
-                [
-                   {{UNIT_TEST_STORE_CODE}}
-                ],
+        $data = '{
+            "batch": [
+                {{UNIT_TEST_STORE_CODE}},
             ],
+        }';
 
-        ];
-
-        $dataJson = json_encode($data);
+        $data = json_decode($data, true);
 
         $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}-ext/batch-store";
 
@@ -196,17 +189,13 @@ class {{RNT}}ControllerTest extends BaseTest
      */
     public function testBatchUpdate()
     {
-        $data = [
-            "batch" => [
-                [
-                    "id" => 0,
-                   {{UNIT_TEST_STORE_CODE}}
-                ],
+        $data = '{
+            "batch": [
+                {{UNIT_TEST_STORE_CODE}},
             ],
+        }';
 
-        ];
-
-        $dataJson = json_encode($data);
+        $data = json_decode($data, true);
 
         $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}-ext/batch-update";
 

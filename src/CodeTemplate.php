@@ -483,5 +483,42 @@ class CodeTemplate
         return $codeString;
     }
 
+    public function getUnitTestStoreJsonTpl(array $ignoreFields = []) : string
+    {
+        $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
+
+        $fields = [];
+
+        foreach ($tableFullColumns as $column) {
+            if (in_array($column->Field, $ignoreFields)) {
+                continue;
+            }
+            $camelField = Str::camel($column->Field);
+
+            //****
+            $matcher = new DataTypeMatcher($column->Field, $column->Type, $column->Comment);
+            if ( !empty($matcher->matchInt())) {
+                $type = "(int)";
+                $val  = 0;
+            } else if ( !empty($matcher->matchFloat())) {
+                $type = "(double)";
+                $val  = 0.00;
+            } else if ( !empty($matcher->matchString())) {
+                $type = "(string)";
+                $val  = "";
+            } else if ( !empty($matcher->matchDate())) {
+                $type = "";
+                $val  = null;
+            } else {
+                $type = "(string)";
+                $val  = "";
+            }
+
+            $fields[$camelField] = $val;
+            //****
+        }
+
+        return json_encode($fields);
+    }
 }
 
