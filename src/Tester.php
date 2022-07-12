@@ -16,6 +16,10 @@ class Tester
 
     public static function testRunner()
     {
+    }
+
+    public static function testRunner()
+    {
         $params1 = [
             "tableShard"    => 1,
             "shardCount"    => 2,
@@ -39,14 +43,25 @@ class Tester
 
     public static function callCreator(array $params) : array
     {
-        $inputParams = [
-            "tableShard"    => $params["tableShard"],
-            "shardCount"    => $params["shardCount"],
-            "maxShardCount" => $params["maxShardCount"],
-            "tablePrefix"   => $params["tablePrefix"],
-            "tableName"     => $params["tableName"],
-            "controls"      => $params["controls"],
-        ];
+        if ($params["tableShard"]) {
+            $inputParams = [
+                "tableShard"    => 1,
+                "shardCount"    => $params["shardCount"] >= 2 ? $params["shardCount"] : 2,
+                "maxShardCount" => 64,
+                "tablePrefix"   => $params["tablePrefix"],
+                "tableName"     => $params["tableName"],
+                "controls"      => $params["controls"],
+            ];
+        } else {
+            $inputParams = [
+                "tableShard"    => 0,
+                "shardCount"    => 0,
+                "maxShardCount" => 0,
+                "tablePrefix"   => $params["tablePrefix"],
+                "tableName"     => $params["tableName"],
+                "controls"      => $params["controls"],
+            ];
+        }
 
         if ( !static::validateControlName($inputParams["controls"])) {
             throw new \Exception("格式有误，参考格式: A.B 或 A.B.C ");

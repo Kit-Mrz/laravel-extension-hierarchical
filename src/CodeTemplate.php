@@ -445,36 +445,85 @@ class CodeTemplate
     {
         $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
 
+        /** @var \Faker\Generator::class $faker */
+        $faker = app(\Faker\Generator::class);
+
         $codeString = "";
         foreach ($tableFullColumns as $column) {
             if (in_array($column->Field, $ignoreFields)) {
                 continue;
             }
-            $snakeField = Str::snake($column->Field);
             $camelField = Str::camel($column->Field);
 
             //****
             $matcher = new DataTypeMatcher($column->Field, $column->Type, $column->Comment);
-            if ( !empty($matcher->matchInt())) {
+            if ( !empty($matchResult = $matcher->matchInt())) {
                 $template = '"%s" => %s %d,%s';
                 $type     = "(int)";
-                $val      = 0;
+                $val      = mt_rand(0, $matchResult["max"] ?? 2147483647);
             } else if ( !empty($matcher->matchFloat())) {
                 $template = '"%s" => %s %2f,%s';
                 $type     = "(double)";
-                $val      = 0.00;
+                $val      = mt_rand(0, $matchResult["max"] ?? 2147483647);;
             } else if ( !empty($matcher->matchString())) {
+                $text     = $faker->realTextBetween(5, 100);
                 $template = '"%s" => %s %s,%s';
                 $type     = "(string)";
-                $val      = "\"\"";
+                $val      = "\"{$text}\"";
             } else if ( !empty($matcher->matchDate())) {
+                $text     = date('Y-m-d H:i:s');
                 $template = '"%s" => %s %s,%s';
                 $type     = "";
-                $val      = "null";
+                $val      = "{$text}";
+            } else {
+                $text     = $faker->realTextBetween(5, 100);
+                $template = '"%s" => %s %s,%s';
+                $type     = "(string)";
+                $val      = "{$text}";
+            }
+            $codeString .= sprintf($template, $camelField, $type, $val, "\r\n");
+            //****
+        }
+
+        return $codeString;
+    }
+
+    public function getUnitTestStoreSeedTpl(array $ignoreFields = []) : string
+    {
+        $tableFullColumns = $this->getTableInformationContract()->getTableFullColumns();
+
+        $codeString = "";
+        foreach ($tableFullColumns as $column) {
+            if (in_array($column->Field, $ignoreFields)) {
+                continue;
+            }
+            $camelField = Str::camel($column->Field);
+
+            //****
+            $matcher = new DataTypeMatcher($column->Field, $column->Type, $column->Comment);
+            if ( !empty($matchResult = $matcher->matchInt())) {
+                $max      = $matchResult["max"] ?? 2147483647;
+                $template = '"%s" => %s %s,%s';
+                $type     = "(int)";
+                $val      = "mt_rand(0, {$max})";
+            } else if ( !empty($matchResult = $matcher->matchFloat())) {
+                $max      = $matchResult["max"] ?? 2147483647;
+                $template = '"%s" => %s %s,%s';
+                $type     = "(double)";
+                $val      = "mt_rand(0, {$max})";
+            } else if ( !empty($matchResult = $matcher->matchString())) {
+                $max      = $matchResult["max"] ?? 100;
+                $template = '"%s" => %s %s,%s';
+                $type     = "(string)";
+                $val      = "\$this->getFaker()->realTextBetween(5, {$max})";
+            } else if ( !empty($matchResult = $matcher->matchDate())) {
+                $template = '"%s" => %s %s,%s';
+                $type     = "";
+                $val      = "date('Y-m-d H:i:s')";
             } else {
                 $template = '"%s" => %s %s,%s';
                 $type     = "(string)";
-                $val      = "";
+                $val      = "\$this->getFaker()->realTextBetween(5, 100)";
             }
             $codeString .= sprintf($template, $camelField, $type, $val, "\r\n");
             //****

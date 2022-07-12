@@ -216,4 +216,32 @@ class {{RNT}}ControllerTest extends BaseTest
 
         $response->assertStatus(200);
     }
+
+    /**
+     * @desc {{RNT}}
+     * @see {{RNT}}Controller::batchStore()
+     * @uri get:/{{RNT_ROUTE_PATH}}-ext/batch-store
+     */
+    public function testSeed()
+    {
+        $data = [
+            "batch" => [],
+        ];
+
+        for ($i = 0; $i < 5; $i++) {
+            $data["batch"][] = [
+                {{UNIT_TEST_STORE_SEED_TPL}}
+            ];
+        }
+
+        $dataJson = json_encode($data);
+
+        $uri = self::PREFIX . "/{{RNT_ROUTE_PATH}}-ext/batch-store";
+
+        $response = $this->post($uri, $data, ["Authorization" => $this->getToken(),]);
+
+        $response->dump();
+
+        $response->assertStatus(200);
+    }
 }

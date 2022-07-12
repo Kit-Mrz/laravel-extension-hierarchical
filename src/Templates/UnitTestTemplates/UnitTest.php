@@ -66,6 +66,7 @@ class UnitTest implements TemplateHandleContract
         return [
             "id", "createdBy", "createdAt", "updatedBy", "updatedAt", "deletedBy", "deletedAt",
             "id", "created_by", "created_at", "updated_by", "updated_at", "deleted_by", "deleted_at",
+            "tenant_id", "tenantId",
         ];
     }
 
@@ -82,6 +83,7 @@ class UnitTest implements TemplateHandleContract
         //********************************************************
 
         $unitTestStoreCodeTemplate = $this->getCodeTemplate()->getUnitTestStoreTpl($this->getIgnoreFields());
+        $unitTestStoreSeedTpl      = $this->getCodeTemplate()->getUnitTestStoreSeedTpl($this->getIgnoreFields());
 
         //********************************************************
 
@@ -101,10 +103,11 @@ class UnitTest implements TemplateHandleContract
 
         // 替换规则
         $replacementRules = [
-            '/{{NAMESPACE_PATH}}/'       => $namespacePath,
-            '/{{RNT}}/'                  => $controlName,
-            '/{{RNT_ROUTE_PATH}}/'       => Str::snake($controlName, '-'),
-            '/{{UNIT_TEST_STORE_CODE}}/' => $unitTestStoreCodeTemplate,
+            '/{{NAMESPACE_PATH}}/'           => $namespacePath,
+            '/{{RNT}}/'                      => $controlName,
+            '/{{RNT_ROUTE_PATH}}/'           => Str::snake($controlName, '-'),
+            '/{{UNIT_TEST_STORE_CODE}}/'     => $unitTestStoreCodeTemplate,
+            '/{{UNIT_TEST_STORE_SEED_TPL}}/' => $unitTestStoreSeedTpl,
         ];
 
         // 替换规则-回调
