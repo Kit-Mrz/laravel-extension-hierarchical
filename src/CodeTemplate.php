@@ -473,10 +473,9 @@ class CodeTemplate
                 $type     = "(string)";
                 $val      = "\"{$text}\"";
             } else if ( !empty($matcher->matchDate())) {
-                $text     = date('Y-m-d H:i:s');
                 $template = '"%s" => %s %s,%s';
                 $type     = "";
-                $val      = "\"{$text}\"";
+                $val      = "date('Y-m-d H:i:s')";
             } else {
                 $text     = $faker->realTextBetween(5, 100);
                 $text     = str_replace('"', '', $text);
