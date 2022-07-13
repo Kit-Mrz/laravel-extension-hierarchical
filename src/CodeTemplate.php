@@ -476,7 +476,7 @@ class CodeTemplate
                 $text     = date('Y-m-d H:i:s');
                 $template = '"%s" => %s %s,%s';
                 $type     = "";
-                $val      = "{$text}";
+                $val      = "\"{$text}\"";
             } else {
                 $text     = $faker->realTextBetween(5, 100);
                 $text     = str_replace('"', '', $text);
