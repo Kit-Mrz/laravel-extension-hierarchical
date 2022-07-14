@@ -26,10 +26,6 @@ class CodeTemplate
         return $this->tableInformationContract;
     }
 
-    /**
-     * @desc 渲染的表名
-     * @return string
-     */
     public function getRenderTableName() : string
     {
         $tableName = $this->getTableInformationContract()->getTableName();

@@ -4,40 +4,19 @@ namespace Mrzkit\LaravelExtensionHierarchical;
 
 use Mrzkit\LaravelExtensionHierarchical\Contracts\DataTypeMatchContract;
 
-class DataTypeMatcher implements DataTypeMatchContract
+class DataTypeMatch implements DataTypeMatchContract
 {
-    /**
-     * @var string
-     */
-    private $field;
+    private string $type;
+    private string $field;
 
-    /**
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var string
-     */
-    private $comment;
-
-    public function __construct(string $field, string $type, string $comment)
+    public function __construct(string $type, string $field)
     {
-        $this->field   = $field;
-        $this->type    = $type;
-        $this->comment = $comment;
+        $this->type  = $type;
+        $this->field = $field;
     }
 
     /**
-     * @return String
-     */
-    public function getField() : string
-    {
-        return $this->field;
-    }
-
-    /**
-     * @return String
+     * @return string
      */
     public function getType() : string
     {
@@ -47,9 +26,9 @@ class DataTypeMatcher implements DataTypeMatchContract
     /**
      * @return String
      */
-    public function getComment() : string
+    public function getField() : string
     {
-        return $this->comment;
+        return $this->field;
     }
 
     /**
@@ -300,4 +279,5 @@ class DataTypeMatcher implements DataTypeMatchContract
 
         return $result;
     }
+
 }

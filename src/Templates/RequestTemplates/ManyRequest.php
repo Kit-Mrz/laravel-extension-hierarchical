@@ -4,7 +4,6 @@ namespace Mrzkit\LaravelExtensionHierarchical\Templates\RequestTemplates;
 
 use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateContract;
 use Mrzkit\LaravelExtensionHierarchical\Contracts\TemplateHandleContract;
-use Mrzkit\LaravelExtensionHierarchical\TableParser;
 use Mrzkit\LaravelExtensionHierarchical\TemplateObject;
 use Mrzkit\LaravelExtensionHierarchical\TemplateTool;
 
@@ -21,11 +20,6 @@ class ManyRequest implements TemplateHandleContract
      * @var string 数据表名称
      */
     private $tableName;
-
-    /**
-     * @var TableParser 数据表解析器
-     */
-    private $tableParser;
 
     public function __construct(string $controlName)
     {
