@@ -83,7 +83,7 @@ class {{RNT}}Service implements ControlServiceContract
             {{SERVICE_STORE_TPL}}
         ];
 
-        $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}();
+        $repository = {{REPOSITORY}}Factory::get{{REPOSITORY}}()->setFactor($this->getFactorId());
 
         $object = $repository->create($inputParams);
 
